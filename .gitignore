@@ -17,4 +17,5 @@
 
 #Configs
 *.env
+!dev.env
 
