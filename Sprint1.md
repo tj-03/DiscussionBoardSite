@@ -3,6 +3,7 @@
 - As a user, I want to be able to search previous posts to see if people have the same issue as me.
 - As a user, I want the ability to post a question for experts to answer.
 - As a user, I want to be able to edit a post that I have made.
+- As a user, I want to be able to reply/comment on someone else's post.
 
 ## Issues
 - Login button
