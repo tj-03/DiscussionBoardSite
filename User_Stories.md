@@ -24,5 +24,14 @@
 - +  Store system in back-end
 - +  Display system in front-end
 
+- As a user, I want to be able to format my posts using markdown or similar so my posts are easier to read.
+- + Integrate markdown into the platform
+- + Give tips on how to format text
+- + Add buttons for formatting
+
+- As a user, I want to be able to delete my posts in case of a mistake.
+- + Add delete button
+- + Add a confirmation on deletion
+- + Possibly add a restore button
 
 -- This file will be continuously updated with user stories and their related issues as members of the team think of them --
