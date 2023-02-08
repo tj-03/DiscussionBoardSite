@@ -4,6 +4,8 @@
 - As a user, I want the ability to post a question for experts to answer.
 - As a user, I want to be able to edit a post that I have made.
 - As a user, I want to be able to reply/comment on someone else's post.
+- As a user, I want to be able to format my posts using markdown or similar so my posts are easier to read.
+- As a user, I want to be able to delete my posts in case of a mistake.
 
 ## Issues
 - Login button
