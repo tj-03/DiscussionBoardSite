@@ -25,6 +25,18 @@
 - Archive of user posts and comments
 
 ## Issues Completed
-
+- Login button
+- Text box for credentials
+- Database for credentials
+- Archive of user posts and comments
 
 ## Issues To Be Done In Future
+- Connect backend and frontend feature functionality
+- + The frontend and backend work independently, for future sprints they need to work together.
+
+## Videos for Sprint 1 submission
+
+### Frontend
+https://youtu.be/ZH4WMM9W3es
+
+### Backend
