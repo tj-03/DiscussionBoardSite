@@ -27,10 +27,11 @@
 ## Issues Completed
 - Login button
 - Text box for credentials
-- Database for credentials
 - Archive of user posts and comments
 
 ## Issues To Be Done In Future
+- Implement database for user authenticaiton with firebase for login ability
+- + The database for the userbase was implemented but not connected with firebase as there were issues with firebase.
 - Connect backend and frontend feature functionality
 - + The frontend and backend work independently, for future sprints they need to work together.
 
