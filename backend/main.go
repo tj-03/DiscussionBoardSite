@@ -16,11 +16,7 @@ import (
 func init() {
 	godotenv.Load("dev.env")
 }
-func main() {
-	server := NewServer(os.Getenv("DB_URL"))
-	//log to a file
-	log.Fatal(server.Run(os.Getenv("PORT")))
-
+func servConn(server Server) (*mongo.Client, context.Context) {
 	//Instantiates the client and connection location
 	client, err := mongo.NewClient(options.Client().ApplyURI(server))
 	if err != nil {
@@ -39,6 +35,15 @@ func main() {
 		log.Fatal(err)
 	}
 
+	return client, ctx
+}
+func main() {
+	server := NewServer(os.Getenv("DB_URL"))
+	//log to a file
+	log.Fatal(server.Run(os.Getenv("PORT")))
+
+	//Instantiates the client and connection location
+	client, ctx := servConn(server)
 	//Disconnects the client
 	defer client.Disconnect(ctx)
 }
