@@ -1,18 +1,109 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"context"
+	"os"
+	"time"
+
+	firebase "firebase.google.com/go"
+	"github.com/gin-contrib/static"
+	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"google.golang.org/api/option"
+)
 
 type Server struct {
 	Engine *gin.Engine
+	Db     *mongo.Database
 }
 
-//TODO: Set up endpoints
-//TODO: This should eventually be set up to connect to a database and maybe use custom logging
+func getDbConn(dbUrl string) (*mongo.Database, error) {
+	//Instantiates the client and connection location
+	client, err := mongo.NewClient(options.Client().ApplyURI(dbUrl))
+	if err != nil {
+		return nil, err
+	}
+
+	//Instantiates the context and connects the to the client
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	err = client.Connect(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	err = client.Ping(ctx, readpref.Primary())
+	if err != nil {
+		return nil, err
+	}
+
+	return client.Database(os.Getenv("DB_NAME")), nil
+}
+
 func (s *Server) Init(dbUrl string) {
 	engine := gin.Default()
-	engine.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{"message": "Hello world"})
+	db, err := getDbConn(dbUrl)
+	if err != nil {
+		panic(err)
+	}
+	if db == nil {
+		panic("db is nil")
+	}
+
+	//Set up firebase auth
+	opt := option.WithCredentialsFile("./firebaseKeys.json")
+	firebaseApp, err := firebase.NewApp(context.Background(), nil, opt)
+	if err != nil {
+		panic(err)
+	}
+	firebaseAuthClient, err := firebaseApp.Auth(context.Background())
+	if err != nil {
+		panic(err)
+	}
+	authProvider := NewFirebaseAuthProvider(firebaseAuthClient, db)
+
+	postRepo := NewPostRepository(db)
+	userRepo := NewUserRepository(db)
+
+	s.Db = db
+
+	engine.Use(static.Serve("/", static.LocalFile("../frontend/dist/discussion-board", false)))
+
+	apiGroup := engine.Group("api")
+	apiGroup.Use(authProvider.Middleware())
+
+	//TODO:Abstract this into seperate function or interface/struct
+	//Get posts from user
+	apiGroup.GET("/user/posts/:id", func(c *gin.Context) {
+		posts, err := postRepo.GetPostsFromUserId(c.Param("id"))
+		if err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(200, posts)
 	})
+
+	//Get all posts
+	apiGroup.GET("/posts", func(c *gin.Context) {
+		posts, err := postRepo.GetAllPosts()
+		if err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(200, posts)
+	})
+
+	//Get user profile
+	apiGroup.GET("/user/:id", func(c *gin.Context) {
+		user, err := userRepo.FindUser(c.Param("id"))
+		if err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(200, user)
+	})
+
 	s.Engine = engine
 }
 
