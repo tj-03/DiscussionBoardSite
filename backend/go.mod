@@ -45,6 +45,7 @@ require (
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/swaggo/swag v1.8.10 // indirect
 	github.com/ugorji/go/codec v1.2.9 // indirect
+	go.mongodb.org/mongo-driver v1.11.1 // indirect
 	github.com/urfave/cli/v2 v2.24.3 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	go.opencensus.io v0.24.0 // indirect
