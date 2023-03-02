@@ -63,6 +63,7 @@ func NewMockRouter() *gin.Engine {
 	}
 
 	router := gin.Default()
+	router.Use(CorsMiddleWare())
 	router.Use(static.Serve("/", static.LocalFile("../frontend/dist/discussion-board", false)))
 
 	apiGroup := router.Group("api")
