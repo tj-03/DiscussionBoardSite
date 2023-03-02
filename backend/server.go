@@ -107,11 +107,22 @@ func (s *Server) Init(dbUrl string) {
 	s.Engine = engine
 }
 
+func (s *Server) InitWithRouter(router *gin.Engine) {
+	s.Engine = router
+}
+
 func (s *Server) Run(port string) error {
 	return s.Engine.Run("localhost:" + port)
 }
 func NewServer(dbUrl string) Server {
 	var s Server
 	s.Init(dbUrl)
+	return s
+}
+
+//returns a server with a default router and mock data
+func NewMockServer() Server {
+	var s Server
+	s.InitWithRouter(NewMockRouter())
 	return s
 }
