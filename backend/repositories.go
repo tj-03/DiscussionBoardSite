@@ -47,6 +47,11 @@ func NewPostRepository(db *mongo.Database) PostRepository {
 	return PostRepository{coll: db.Collection("Posts")}
 }
 
+func (p *PostRepository) AddPost(post Post) error {
+	_, err := p.coll.InsertOne(context.Background(), post)
+	return err
+}
+
 func (p *PostRepository) FindPost(postId string) (Post, error) {
 	post := Post{}
 	err := p.coll.FindOne(context.Background(), bson.M{"_id": postId}).Decode(&post)
@@ -71,4 +76,34 @@ func (p *PostRepository) GetPostsFromUserId(userId string) ([]Post, error) {
 	var posts []Post
 	err = cursor.All(context.Background(), &posts)
 	return posts, err
+}
+
+type Comment struct {
+	PostID    string `json:"post_id" bson:"PostID,omitempty"`
+	Author    string `json:"author" bson:"Author,omitempty"`
+	Body      string `json:"content" bson:"Body,omitempty"`
+	CommentID string `json:"comment_id" bson:"CommentID,omitempty"`
+}
+
+type CommentRepository struct {
+	coll *mongo.Collection
+}
+
+func NewCommentRepository(db *mongo.Database) CommentRepository {
+	return CommentRepository{coll: db.Collection("Comments")}
+}
+
+func (c *CommentRepository) AddCommet(comment Comment) error {
+	_, err := c.coll.InsertOne(context.Background(), comment)
+	return err
+}
+
+func (c *CommentRepository) GetAllComments() ([]Comment, error) {
+	cursor, err := c.coll.Find(context.Background(), NoFilter)
+	if err != nil {
+		return nil, err
+	}
+	var comments []Comment
+	err = cursor.All(context.Background(), &comments)
+	return comments, err
 }
