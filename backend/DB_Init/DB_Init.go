@@ -10,6 +10,18 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
+func checkIfDBExists(client *mongo.Client, dbName string) bool {
+	dbs, err := client.ListDatabaseNames(context.Background(), map[string]interface{}{})
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, db := range dbs {
+		if db == dbName {
+			return true
+		}
+	}
+	return false
+}
 func createDatabaseCollections(myDB *mongo.Database) {
 	postsCol := myDB.Collection("Posts")
 	myDB.Collection("Comments")
@@ -32,11 +44,20 @@ func createDatabaseCollections(myDB *mongo.Database) {
 
 }
 func createTestDatabase(client *mongo.Client) {
-	db := client.Database("TEST_DB")
-	if db == nil {
-		log.Fatal("db is nil")
+	dbs, err := client.ListDatabaseNames(context.Background(), map[string]interface{}{})
+	if err != nil {
+		log.Fatal(err)
 	}
-	createDatabaseCollections(db)
+	for _, db := range dbs {
+		if db == "TEST_DB" {
+			return
+		}
+	}
+	if checkIfDBExists(client, "TEST_DB") {
+		return
+	}
+	myDB := client.Database("TEST_DB")
+	createDatabaseCollections(myDB)
 
 }
 func main() {
@@ -62,10 +83,13 @@ func main() {
 	defer client.Disconnect(ctx)
 	createTestDatabase(client)
 	//Creates database and collections
+	if checkIfDBExists(client, "myDB") {
+		return
+	}
 	myDB := client.Database("myDB")
-	myDB.Collection("Posts")
-	myDB.Collection("Comments")
-	myDB.Collection("Users")
+	myDB.CreateCollection(context.Background(), "Posts")
+	myDB.CreateCollection(context.Background(), "Comments")
+	myDB.CreateCollection(context.Background(), "Users")
 
 	if err != nil {
 		log.Fatal(err)
