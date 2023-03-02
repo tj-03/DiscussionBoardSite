@@ -10,7 +10,7 @@ import (
 var NoFilter = map[string]interface{}{}
 
 type User struct {
-	UserId   string `json:"id" bson:"UserID,omitempty"` // bson is for mongo
+	UserId   string `json:"id" bson:"_id,omitempty"` // bson is for mongo
 	Username string `json:"name" bson:"Username,omitempty"`
 }
 
@@ -24,7 +24,7 @@ func NewUserRepository(db *mongo.Database) UserRepository {
 
 func (u *UserRepository) FindUser(id string) (User, error) {
 	user := User{}
-	err := u.coll.FindOne(context.Background(), bson.M{"UserID": id}).Decode(&user)
+	err := u.coll.FindOne(context.Background(), User{UserId: id}).Decode(&user)
 	return user, err
 }
 
