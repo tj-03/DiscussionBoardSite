@@ -89,8 +89,8 @@ type CommentRepository struct {
 	coll *mongo.Collection
 }
 
-func NewCommentRepository(db *mongo.Database) PostRepository {
-	return PostRepository{coll: db.Collection("Comments")}
+func NewCommentRepository(db *mongo.Database) CommentRepository {
+	return CommentRepository{coll: db.Collection("Comments")}
 }
 
 func (c *CommentRepository) AddCommet(comment Comment) error {
