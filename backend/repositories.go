@@ -80,16 +80,23 @@ func (p *PostRepository) GetPostsFromUserId(userId string) ([]Post, error) {
 }
 
 type Comment struct {
+<<<<<<< Updated upstream
 	PostID    string `json:"post_id" bson:"PostID,omitempty"`
 	Author    string `json:"author" bson:"Author,omitempty"`
 	Body      string `json:"content" bson:"Body,omitempty"`
 	CommentID string `json:"comment_id" bson:"CommentID,omitempty"`
+=======
+	ID       string `json:"id" bson:"_id,omitempty"`
+	AuthorId string `json:"author_id" bson:"author_id,omitempty"`
+	Content  string `json:"content" bson:"content,omitempty"`
+>>>>>>> Stashed changes
 }
 
 type CommentRepository struct {
 	coll *mongo.Collection
 }
 
+<<<<<<< Updated upstream
 func NewCommentRepository(db *mongo.Database) PostRepository {
 	return PostRepository{coll: db.Collection("Comments")}
 }
@@ -98,3 +105,19 @@ func (c *CommentRepository) AddComment(comment Comment) error {
 	_, err := c.coll.InsertOne(context.Background(), comment)
 	return err
 }
+=======
+func (c *CommentRepository) AddCommet(comment Comment) error {
+	_, err := c.coll.InsertOne(context.Background(), comment)
+	return err
+}
+
+func (c *CommentRepository) GetAllComments() ([]Comment, error) {
+	cursor, err := c.coll.Find(context.Background(), NoFilter)
+	if err != nil {
+		return nil, err
+	}
+	var comments []Comment
+	err = cursor.All(context.Background(), &comments)
+	return comments, err
+}
+>>>>>>> Stashed changes
