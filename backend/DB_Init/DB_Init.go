@@ -2,16 +2,43 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
+func createDatabaseCollections(myDB *mongo.Database) {
+	postsCol := myDB.Collection("Posts")
+	myDB.Collection("Comments")
+	usersCol := myDB.Collection("Users")
+
+	mockUsers := createTestUsers()
+	for _, user := range mockUsers {
+		_, err := usersCol.InsertOne(context.Background(), user)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	mockPosts := createTestPosts()
+	for _, post := range mockPosts {
+		_, err := postsCol.InsertOne(context.Background(), post)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+}
+func createTestDatabase(client *mongo.Client) {
+	db := client.Database("TEST_DB")
+	if db == nil {
+		log.Fatal("db is nil")
+	}
+	createDatabaseCollections(db)
+
+}
 func main() {
 	//Instantiates the client and connection location
 	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://127.0.0.1:27017"))
@@ -33,49 +60,15 @@ func main() {
 
 	//Disconnects the client
 	defer client.Disconnect(ctx)
-
+	createTestDatabase(client)
 	//Creates database and collections
 	myDB := client.Database("myDB")
-	postCollection := myDB.Collection("Posts")
-	commentCollection := myDB.Collection("Comments")
-	userCollection := myDB.Collection("Users")
+	myDB.Collection("Posts")
+	myDB.Collection("Comments")
+	myDB.Collection("Users")
 
-	//Creates test post in post collection
-	_, err = postCollection.InsertOne(ctx, bson.D{
-		{Key: "Title", Value: "Test Title"},
-		{Key: "Author", Value: "Test Author"},
-		{Key: "Body", Value: "This is a test post."},
-		{Key: "PostID", Value: "0"},
-	})
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	//Creates test comment in comment collection
-	_, err = commentCollection.InsertOne(ctx, bson.D{
-		{Key: "PostID", Value: "0"},
-		{Key: "Author", Value: "Test Author"},
-		{Key: "Body", Value: "This is a test comment on the test post."},
-		{Key: "CommentID", Value: "0"},
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	//Create user database
-	_, err = userCollection.InsertOne(ctx, bson.D{
-		{Key: "UserID", Value: ""},
-		{Key: "Username", Value: "TestAccount"},
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	//Lists the current databases
-	DBs, err := client.ListDatabaseNames(ctx, bson.M{})
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(DBs)
 
 }
