@@ -34,10 +34,9 @@ func (u *UserRepository) CreateNewUser(user User) error {
 }
 
 type Post struct {
-	Title  string `json:"title" bson:"Title,omitempty"`
-	Author string `json:"author_id" bson:"Author,omitempty"`
-	Body   string `json:"content" bson:"Body,omitempty"`
-	PostId string `json:"post_id" bson:"PostID,omitempty"`
+	ID       string `json:"id" bson:"_id,omitempty"`
+	AuthorId string `json:"author_id" bson:"author_id,omitempty"`
+	Content  string `json:"content" bson:"content,omitempty"`
 }
 
 type PostRepository struct {
@@ -48,15 +47,15 @@ func NewPostRepository(db *mongo.Database) PostRepository {
 	return PostRepository{coll: db.Collection("Posts")}
 }
 
+func (p *PostRepository) AddPost(post Post) error {
+	_, err := p.coll.InsertOne(context.Background(), post)
+	return err
+}
+
 func (p *PostRepository) FindPost(postId string) (Post, error) {
 	post := Post{}
 	err := p.coll.FindOne(context.Background(), bson.M{"_id": postId}).Decode(&post)
 	return post, err
-}
-
-func (p *PostRepository) AddPost(post Post) error {
-	_, err := p.coll.InsertOne(context.Background(), post)
-	return err
 }
 
 func (p *PostRepository) GetAllPosts() ([]Post, error) {
@@ -70,7 +69,7 @@ func (p *PostRepository) GetAllPosts() ([]Post, error) {
 }
 
 func (p *PostRepository) GetPostsFromUserId(userId string) ([]Post, error) {
-	cursor, err := p.coll.Find(context.Background(), Post{Author: userId})
+	cursor, err := p.coll.Find(context.Background(), Post{AuthorId: userId})
 	if err != nil {
 		return nil, err
 	}
@@ -80,32 +79,20 @@ func (p *PostRepository) GetPostsFromUserId(userId string) ([]Post, error) {
 }
 
 type Comment struct {
-<<<<<<< Updated upstream
 	PostID    string `json:"post_id" bson:"PostID,omitempty"`
 	Author    string `json:"author" bson:"Author,omitempty"`
 	Body      string `json:"content" bson:"Body,omitempty"`
 	CommentID string `json:"comment_id" bson:"CommentID,omitempty"`
-=======
-	ID       string `json:"id" bson:"_id,omitempty"`
-	AuthorId string `json:"author_id" bson:"author_id,omitempty"`
-	Content  string `json:"content" bson:"content,omitempty"`
->>>>>>> Stashed changes
 }
 
 type CommentRepository struct {
 	coll *mongo.Collection
 }
 
-<<<<<<< Updated upstream
 func NewCommentRepository(db *mongo.Database) PostRepository {
 	return PostRepository{coll: db.Collection("Comments")}
 }
 
-func (c *CommentRepository) AddComment(comment Comment) error {
-	_, err := c.coll.InsertOne(context.Background(), comment)
-	return err
-}
-=======
 func (c *CommentRepository) AddCommet(comment Comment) error {
 	_, err := c.coll.InsertOne(context.Background(), comment)
 	return err
@@ -120,4 +107,3 @@ func (c *CommentRepository) GetAllComments() ([]Comment, error) {
 	err = cursor.All(context.Background(), &comments)
 	return comments, err
 }
->>>>>>> Stashed changes
