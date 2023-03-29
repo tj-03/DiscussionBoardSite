@@ -191,3 +191,32 @@ func TestGetUserThatDoesNotExist(t *testing.T) {
 		t.Errorf("There was no error when there should have been!")
 	}
 }
+
+func TestAddUser(t *testing.T) {
+	userId := "6"
+	name := "user6"
+
+	var nUser User
+	nUser.UserId = userId
+	nUser.Username = name
+
+	db, err := getTestDb(os.Getenv("DB_URL"))
+	if err != nil {
+		t.Errorf("There was an error connecting to the database: %v", err)
+	}
+	userRepo := NewUserRepository(db)
+	_, err = userRepo.FindUser(userId)
+	if err == nil {
+		t.Errorf("User should not exist!")
+	}
+
+	userRepo.CreateNewUser(nUser)
+
+	user, err := userRepo.FindUser(userId)
+	if err != nil {
+		t.Errorf("There was an error getting the user: %v", err)
+	}
+	if user.UserId != userId {
+		t.Errorf("The user returned was not the one requested!")
+	}
+}
