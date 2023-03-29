@@ -109,7 +109,7 @@ func NewCommentRepository(db *mongo.Database) CommentRepository {
 	return CommentRepository{coll: db.Collection("Comments")}
 }
 
-func (c *CommentRepository) AddCommet(comment Comment) error {
+func (c *CommentRepository) AddComment(comment Comment) error {
 	_, err := c.coll.InsertOne(context.Background(), comment)
 	return err
 }
@@ -135,7 +135,7 @@ func (c *CommentRepository) GetAllCommentsFromUserId(userId string) ([]Comment, 
 }
 
 func (c *CommentRepository) GetAllCommentsFromPostId(postId string) ([]Comment, error) {
-	cursor, err := c.coll.Find(context.Background(), Post{AuthorId: postId})
+	cursor, err := c.coll.Find(context.Background(), Comment{PostID: postId})
 	if err != nil {
 		return nil, err
 	}

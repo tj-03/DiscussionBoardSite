@@ -220,3 +220,109 @@ func TestAddUser(t *testing.T) {
 		t.Errorf("The user returned was not the one requested!")
 	}
 }
+
+func TestGetAllComments(t *testing.T) {
+	db, err := getTestDb(os.Getenv("DB_URL"))
+	if err != nil {
+		t.Errorf("There was an error connecting to the database: %v", err)
+	}
+
+	commentRepo := NewCommentRepository(db)
+	comments, err := commentRepo.GetAllComments()
+	if comments == nil || len(comments) != 3 || err != nil {
+		t.Errorf("Incorrect number of comments returned!")
+	}
+}
+
+func TestGetAllCommentsFromUser(t *testing.T) {
+	db, err := getTestDb(os.Getenv("DB_URL"))
+	if err != nil {
+		t.Errorf("There was an error connecting to the database: %v", err)
+	}
+	userId := "1"
+
+	commentRepo := NewCommentRepository(db)
+	comments, err := commentRepo.GetAllCommentsFromUserId(userId)
+	if comments == nil || len(comments) != 2 || err != nil {
+		t.Errorf("Incorrect number of comments returned!")
+	}
+}
+
+func TestGetAllCommentsFromPost(t *testing.T) {
+	db, err := getTestDb(os.Getenv("DB_URL"))
+	if err != nil {
+		t.Errorf("There was an error connecting to the database: %v", err)
+	}
+	postId := "2"
+
+	commentRepo := NewCommentRepository(db)
+	comments, err := commentRepo.GetAllCommentsFromPostId(postId)
+	if comments == nil || len(comments) != 1 || err != nil {
+		t.Errorf("Incorrect number of comments returned!")
+	}
+}
+
+func TestGetExistingComment(t *testing.T) {
+	postId := "1"
+	commentId := "1"
+	db, err := getTestDb(os.Getenv("DB_URL"))
+	if err != nil {
+		t.Errorf("There was an error connecting to the database: %v", err)
+	}
+	commentRepo := NewCommentRepository(db)
+	comment, err := commentRepo.FindComment(postId, commentId)
+	if err != nil {
+		t.Errorf("There was an error getting the post: %v", err)
+	}
+	if comment.CommentID != commentId {
+		t.Errorf("The comment returned was not the one requested!")
+	}
+}
+
+func TestCommentDoesNotExist(t *testing.T) {
+	postId := "1"
+	commentId := "3"
+	db, err := getTestDb(os.Getenv("DB_URL"))
+	if err != nil {
+		t.Errorf("There was an error connecting to the database: %v", err)
+	}
+	commentRepo := NewCommentRepository(db)
+	_, err = commentRepo.FindComment(postId, commentId)
+	if err == nil {
+		t.Errorf("There was no error when there should have been!")
+	}
+
+}
+
+func TestAddComment(t *testing.T) {
+	postId := "3"
+	author := "4"
+	body := "comment4"
+	commentId := "1"
+
+	var nComment Comment
+	nComment.PostID = postId
+	nComment.Author = author
+	nComment.Body = body
+	nComment.CommentID = commentId
+
+	db, err := getTestDb(os.Getenv("DB_URL"))
+	if err != nil {
+		t.Errorf("There was an error connecting to the database: %v", err)
+	}
+	commentRepo := NewCommentRepository(db)
+	_, err = commentRepo.FindComment(postId, commentId)
+	if err == nil {
+		t.Errorf("Comment should not exist!")
+	}
+
+	commentRepo.AddComment(nComment)
+
+	comment, err := commentRepo.FindComment(postId, commentId)
+	if err != nil {
+		t.Errorf("There was an error getting the comment: %v", err)
+	}
+	if comment.CommentID != commentId {
+		t.Errorf("The comment returned was not the one requested!")
+	}
+}
