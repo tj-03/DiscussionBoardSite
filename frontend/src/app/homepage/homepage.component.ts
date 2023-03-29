@@ -1,24 +1,10 @@
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
-import { NgModel } from '@angular/forms';
-
+import { Component } from '@angular/core';
 
 @Component({
-  selector: 'homepage',
+  selector: 'app-homepage',
   templateUrl: './homepage.component.html',
-  providers: [HttpClient],
+  styleUrls: ['./homepage.component.css']
 })
+export class HomepageComponent {
 
-export class HomepageComponent implements OnInit {
-  posts: any;
-  constructor(private httpClient: HttpClient) {
-    this.posts = [];
-  }
-
-  ngOnInit() {
-    this.httpClient.get('http://localhost:8080/api/posts').subscribe((posts : Object) => {
-      this.posts = posts;
-      console.log(this.posts);
-    });
-  }
 }

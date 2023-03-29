@@ -13,7 +13,11 @@ import {MatInputModule} from '@angular/material/input';
 import { LoginComponent } from './login/login.component';
 import { HomepageComponent } from './homepage/homepage.component';
 import { StepperComponent } from './stepper/stepper.component';
-import { HttpClientModule } from '@angular/common/http';
+import {MatCardModule} from '@angular/material/card';
+import {MatChipsModule} from '@angular/material/chips';
+import {MatDividerModule} from '@angular/material/divider';
+import {MatBadgeModule} from '@angular/material/badge';
+import {MatIconModule} from '@angular/material/icon';
 
 
 @NgModule({
@@ -33,7 +37,11 @@ import { HttpClientModule } from '@angular/common/http';
     MatButtonModule,
     BrowserAnimationsModule,
     MatInputModule,
-    HttpClientModule
+    MatChipsModule,
+    MatCardModule,
+    MatDividerModule,
+    MatBadgeModule,
+    MatIconModule
   ],
   providers: [],
   bootstrap: [AppComponent]
