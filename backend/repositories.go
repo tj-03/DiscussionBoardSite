@@ -88,14 +88,10 @@ func (p *PostRepository) GetAllPostsFromUserId(userId string) ([]Post, error) {
 	return posts, err
 }
 
-func (p *PostRepository) GetPostFromUserId(userId, postId string) ([]Post, error) {
-	cursor, err := p.coll.Find(context.Background(), Post{AuthorId: userId, ID: postId})
-	if err != nil {
-		return nil, err
-	}
-	var posts []Post
-	err = cursor.All(context.Background(), &posts)
-	return posts, err
+func (p *PostRepository) FindPostFromUserID(postId, userId string) (Post, error) {
+	post := Post{}
+	err := p.coll.FindOne(context.Background(), bson.M{"_id": postId, "author_id": userId}).Decode(&post)
+	return post, err
 }
 
 type Comment struct {
