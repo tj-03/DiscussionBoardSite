@@ -47,6 +47,27 @@ func NewMockRouter() *gin.Engine {
 		},
 	}
 
+	comments := []Comment{
+		Comment{
+			PostID:    "1",
+			Author:    "1",
+			Body:      "comment1",
+			CommentID: "1",
+		},
+		Comment{
+			PostID:    "1",
+			Author:    "1",
+			Body:      "comment2",
+			CommentID: "2",
+		},
+		Comment{
+			PostID:    "2",
+			Author:    "2",
+			Body:      "comment3",
+			CommentID: "1",
+		},
+	}
+
 	users := []User{
 		User{
 			UserId:   "1",

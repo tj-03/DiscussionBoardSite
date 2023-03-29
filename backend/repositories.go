@@ -22,6 +22,16 @@ func NewUserRepository(db *mongo.Database) UserRepository {
 	return UserRepository{coll: db.Collection("Users")}
 }
 
+func (u *UserRepository) GetAllUsers() ([]User, error) {
+	cursor, err := u.coll.Find(context.Background(), NoFilter)
+	if err != nil {
+		return nil, err
+	}
+	var users []User
+	err = cursor.All(context.Background(), &users)
+	return users, err
+}
+
 func (u *UserRepository) FindUser(id string) (User, error) {
 	user := User{}
 	err := u.coll.FindOne(context.Background(), User{UserId: id}).Decode(&user)

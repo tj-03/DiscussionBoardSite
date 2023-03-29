@@ -11,6 +11,13 @@ type Post struct {
 	Content  string `json:"content" bson:"content,omitempty"`
 }
 
+type Comment struct {
+	PostID    string `json:"post_id" bson:"PostID,omitempty"`
+	Author    string `json:"author" bson:"Author,omitempty"`
+	Body      string `json:"content" bson:"Body,omitempty"`
+	CommentID string `json:"comment_id" bson:"CommentID,omitempty"`
+}
+
 func createTestUsers() []User {
 	return []User{
 		{
@@ -35,6 +42,29 @@ func createTestUsers() []User {
 		},
 	}
 
+}
+
+func createTestComments() []Comment {
+	return []Comment{
+		{
+			PostID:    "1",
+			Author:    "1",
+			Body:      "comment1",
+			CommentID: "1",
+		},
+		{
+			PostID:    "1",
+			Author:    "1",
+			Body:      "comment2",
+			CommentID: "2",
+		},
+		{
+			PostID:    "2",
+			Author:    "2",
+			Body:      "comment3",
+			CommentID: "1",
+		},
+	}
 }
 
 func createTestPosts() []Post {

@@ -87,7 +87,20 @@ func TestPostDoesNotExist(t *testing.T) {
 
 }
 
-//test getting a user
+func TestGetAllUser(t *testing.T) {
+	db, err := getTestDb(os.Getenv("DB_URL"))
+	if err != nil {
+		t.Errorf("There was an error connecting to the database: %v", err)
+	}
+
+	userRepo := NewUserRepository(db)
+	users, err := userRepo.GetAllUsers()
+	if users == nil || len(users) == 0 || err != nil {
+		t.Errorf("There were no posts returned!")
+	}
+}
+
+// test getting a user
 func TestGetUser(t *testing.T) {
 	userId := "1"
 	db, err := getTestDb(os.Getenv("DB_URL"))
@@ -104,7 +117,7 @@ func TestGetUser(t *testing.T) {
 	}
 }
 
-//test getting a user that does not exist
+// test getting a user that does not exist
 func TestGetUserThatDoesNotExist(t *testing.T) {
 	userId := "100000"
 	db, err := getTestDb(os.Getenv("DB_URL"))
