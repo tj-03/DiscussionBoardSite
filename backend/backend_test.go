@@ -52,8 +52,8 @@ func TestGetAllPost(t *testing.T) {
 
 	postRepo := NewPostRepository(db)
 	posts, err := postRepo.GetAllPosts()
-	if posts == nil || len(posts) == 0 || err != nil {
-		t.Errorf("There were no posts returned!")
+	if posts == nil || len(posts) != 5 || err != nil {
+		t.Errorf("Incorrect number of posts returned!")
 	}
 }
 
@@ -95,8 +95,8 @@ func TestGetAllUser(t *testing.T) {
 
 	userRepo := NewUserRepository(db)
 	users, err := userRepo.GetAllUsers()
-	if users == nil || len(users) == 0 || err != nil {
-		t.Errorf("There were no posts returned!")
+	if users == nil || len(users) != 5 || err != nil {
+		t.Errorf("Incorrec number of users returned!")
 	}
 }
 

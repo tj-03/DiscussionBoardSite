@@ -24,12 +24,19 @@ func checkIfDBExists(client *mongo.Client, dbName string) bool {
 }
 func createDatabaseCollections(myDB *mongo.Database) {
 	postsCol := myDB.Collection("Posts")
-	myDB.Collection("Comments")
+	commentsCol := myDB.Collection("Comments")
 	usersCol := myDB.Collection("Users")
 
 	mockUsers := createTestUsers()
 	for _, user := range mockUsers {
 		_, err := usersCol.InsertOne(context.Background(), user)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	mockComments := createTestComments()
+	for _, comment := range mockComments {
+		_, err := commentsCol.InsertOne(context.Background(), comment)
 		if err != nil {
 			log.Fatal(err)
 		}
