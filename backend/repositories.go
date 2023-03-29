@@ -78,8 +78,18 @@ func (p *PostRepository) GetAllPosts() ([]Post, error) {
 	return posts, err
 }
 
-func (p *PostRepository) GetPostsFromUserId(userId string) ([]Post, error) {
+func (p *PostRepository) GetAllPostsFromUserId(userId string) ([]Post, error) {
 	cursor, err := p.coll.Find(context.Background(), Post{AuthorId: userId})
+	if err != nil {
+		return nil, err
+	}
+	var posts []Post
+	err = cursor.All(context.Background(), &posts)
+	return posts, err
+}
+
+func (p *PostRepository) GetPostFromUserId(userId, postId string) ([]Post, error) {
+	cursor, err := p.coll.Find(context.Background(), Post{AuthorId: userId, ID: postId})
 	if err != nil {
 		return nil, err
 	}
@@ -116,4 +126,30 @@ func (c *CommentRepository) GetAllComments() ([]Comment, error) {
 	var comments []Comment
 	err = cursor.All(context.Background(), &comments)
 	return comments, err
+}
+
+func (c *CommentRepository) GetAllCommentsFromUserId(userId string) ([]Comment, error) {
+	cursor, err := c.coll.Find(context.Background(), Comment{Author: userId})
+	if err != nil {
+		return nil, err
+	}
+	var comments []Comment
+	err = cursor.All(context.Background(), &comments)
+	return comments, err
+}
+
+func (c *CommentRepository) GetAllCommentsFromPostId(postId string) ([]Comment, error) {
+	cursor, err := c.coll.Find(context.Background(), Post{AuthorId: postId})
+	if err != nil {
+		return nil, err
+	}
+	var comments []Comment
+	err = cursor.All(context.Background(), &comments)
+	return comments, err
+}
+
+func (c *CommentRepository) FindComment(postId, commentId string) (Comment, error) {
+	comment := Comment{}
+	err := c.coll.FindOne(context.Background(), bson.M{"PostID": postId, "CommentID": commentId}).Decode(&comment)
+	return comment, err
 }
