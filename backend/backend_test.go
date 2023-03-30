@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -17,35 +18,35 @@ func init() {
 	godotenv.Load("dev.env")
 }
 
-func getTestDb(dbUrl string) (*mongo.Database, error) {
+func getTestDb(dbUrl string) (*mongo.Database, context.Context, error) {
 	client, err := mongo.NewClient(options.Client().ApplyURI(dbUrl))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	//Instantiates the context and connects the to the client
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	err = client.Connect(ctx)
 	if err != nil {
-		return nil, err
+		return nil, ctx, err
 	}
 
 	err = client.Ping(ctx, readpref.Primary())
 	if err != nil {
-		return nil, err
+		return nil, ctx, err
 	}
 
 	db := client.Database(os.Getenv("TEST_DB_NAME"))
 	if err != nil {
-		return nil, err
+		return nil, ctx, err
 	}
 	if db == nil {
-		return db, fmt.Errorf("db is nil")
+		return db, ctx, fmt.Errorf("db is nil")
 	}
-	return db, nil
+	return db, ctx, nil
 }
-func TestGetAllPost(t *testing.T) {
-	db, err := getTestDb(os.Getenv("DB_URL"))
+func TestGetAllPosts(t *testing.T) {
+	db, _, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
 		t.Errorf("There was an error connecting to the database: %v", err)
 	}
@@ -59,7 +60,7 @@ func TestGetAllPost(t *testing.T) {
 
 func TestGetExistingPost(t *testing.T) {
 	postId := "1"
-	db, err := getTestDb(os.Getenv("DB_URL"))
+	db, _, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
 		t.Errorf("There was an error connecting to the database: %v", err)
 	}
@@ -75,7 +76,7 @@ func TestGetExistingPost(t *testing.T) {
 
 func TestPostDoesNotExist(t *testing.T) {
 	postId := "100000"
-	db, err := getTestDb(os.Getenv("DB_URL"))
+	db, _, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
 		t.Errorf("There was an error connecting to the database: %v", err)
 	}
@@ -88,16 +89,16 @@ func TestPostDoesNotExist(t *testing.T) {
 }
 
 func TestAddPost(t *testing.T) {
-	postId := "6"
+	postId := "123456789abcdef"
 	author := "2"
-	body := "post6"
+	body := "Add Post Test"
 
 	var nPost Post
 	nPost.AuthorId = author
 	nPost.Content = body
 	nPost.ID = postId
 
-	db, err := getTestDb(os.Getenv("DB_URL"))
+	db, ctx, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
 		t.Errorf("There was an error connecting to the database: %v", err)
 	}
@@ -116,12 +117,14 @@ func TestAddPost(t *testing.T) {
 	if post.ID != postId {
 		t.Errorf("The post returned was not the one requested!")
 	}
+
+	postRepo.coll.DeleteOne(ctx, bson.D{{"_id", "123456789abcdef"}})
 }
 
 func TestGetPostFromUser(t *testing.T) {
 	postId := "1"
 	userId := "1"
-	db, err := getTestDb(os.Getenv("DB_URL"))
+	db, _, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
 		t.Errorf("There was an error connecting to the database: %v", err)
 	}
@@ -136,7 +139,7 @@ func TestGetPostFromUser(t *testing.T) {
 }
 
 func TestGetAllPostFromUser(t *testing.T) {
-	db, err := getTestDb(os.Getenv("DB_URL"))
+	db, _, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
 		t.Errorf("There was an error connecting to the database: %v", err)
 	}
@@ -149,7 +152,7 @@ func TestGetAllPostFromUser(t *testing.T) {
 	}
 }
 func TestGetAllUser(t *testing.T) {
-	db, err := getTestDb(os.Getenv("DB_URL"))
+	db, _, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
 		t.Errorf("There was an error connecting to the database: %v", err)
 	}
@@ -164,7 +167,7 @@ func TestGetAllUser(t *testing.T) {
 // test getting a user
 func TestGetUser(t *testing.T) {
 	userId := "1"
-	db, err := getTestDb(os.Getenv("DB_URL"))
+	db, _, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
 		t.Errorf("There was an error connecting to the database: %v", err)
 	}
@@ -181,7 +184,7 @@ func TestGetUser(t *testing.T) {
 // test getting a user that does not exist
 func TestGetUserThatDoesNotExist(t *testing.T) {
 	userId := "100000"
-	db, err := getTestDb(os.Getenv("DB_URL"))
+	db, _, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
 		t.Errorf("There was an error connecting to the database: %v", err)
 	}
@@ -193,14 +196,14 @@ func TestGetUserThatDoesNotExist(t *testing.T) {
 }
 
 func TestAddUser(t *testing.T) {
-	userId := "6"
-	name := "user6"
+	userId := "123456789abcdef"
+	name := "TestAddUser"
 
 	var nUser User
 	nUser.UserId = userId
 	nUser.Username = name
 
-	db, err := getTestDb(os.Getenv("DB_URL"))
+	db, ctx, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
 		t.Errorf("There was an error connecting to the database: %v", err)
 	}
@@ -219,10 +222,12 @@ func TestAddUser(t *testing.T) {
 	if user.UserId != userId {
 		t.Errorf("The user returned was not the one requested!")
 	}
+
+	userRepo.coll.DeleteOne(ctx, bson.D{{"_id", userId}})
 }
 
 func TestGetAllComments(t *testing.T) {
-	db, err := getTestDb(os.Getenv("DB_URL"))
+	db, _, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
 		t.Errorf("There was an error connecting to the database: %v", err)
 	}
@@ -235,7 +240,7 @@ func TestGetAllComments(t *testing.T) {
 }
 
 func TestGetAllCommentsFromUser(t *testing.T) {
-	db, err := getTestDb(os.Getenv("DB_URL"))
+	db, _, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
 		t.Errorf("There was an error connecting to the database: %v", err)
 	}
@@ -249,7 +254,7 @@ func TestGetAllCommentsFromUser(t *testing.T) {
 }
 
 func TestGetAllCommentsFromPost(t *testing.T) {
-	db, err := getTestDb(os.Getenv("DB_URL"))
+	db, _, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
 		t.Errorf("There was an error connecting to the database: %v", err)
 	}
@@ -265,7 +270,7 @@ func TestGetAllCommentsFromPost(t *testing.T) {
 func TestGetExistingComment(t *testing.T) {
 	postId := "1"
 	commentId := "1"
-	db, err := getTestDb(os.Getenv("DB_URL"))
+	db, _, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
 		t.Errorf("There was an error connecting to the database: %v", err)
 	}
@@ -282,7 +287,7 @@ func TestGetExistingComment(t *testing.T) {
 func TestCommentDoesNotExist(t *testing.T) {
 	postId := "1"
 	commentId := "3"
-	db, err := getTestDb(os.Getenv("DB_URL"))
+	db, _, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
 		t.Errorf("There was an error connecting to the database: %v", err)
 	}
@@ -297,8 +302,8 @@ func TestCommentDoesNotExist(t *testing.T) {
 func TestAddComment(t *testing.T) {
 	postId := "3"
 	author := "4"
-	body := "comment4"
-	commentId := "1"
+	body := "Test Add Comment"
+	commentId := "123456789abcdef"
 
 	var nComment Comment
 	nComment.PostID = postId
@@ -306,7 +311,7 @@ func TestAddComment(t *testing.T) {
 	nComment.Body = body
 	nComment.CommentID = commentId
 
-	db, err := getTestDb(os.Getenv("DB_URL"))
+	db, ctx, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
 		t.Errorf("There was an error connecting to the database: %v", err)
 	}
@@ -325,4 +330,6 @@ func TestAddComment(t *testing.T) {
 	if comment.CommentID != commentId {
 		t.Errorf("The comment returned was not the one requested!")
 	}
+
+	commentRepo.coll.DeleteOne(ctx, bson.D{{"PostID", "3"}, {"CommentID", commentId}})
 }
