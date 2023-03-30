@@ -21,7 +21,7 @@
               "in": "path",
               "description": "ID of the user to get",
               "required": true,
-              "type": "integer"
+              "type": "string"
             }
           ],
           "responses": {
@@ -106,7 +106,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer"
+            "type": "string"
           },
           "name": {
             "type": "string"
