@@ -45,7 +45,7 @@ func getTestDb(dbUrl string) (*mongo.Database, context.Context, error) {
 	}
 	return db, ctx, nil
 }
-func TestGetAllPost(t *testing.T) {
+func TestGetAllPosts(t *testing.T) {
 	db, _, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
 		t.Errorf("There was an error connecting to the database: %v", err)
