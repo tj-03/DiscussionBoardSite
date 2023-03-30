@@ -1,8 +1,57 @@
-<p>Welcome to Heap Underflow! If you need any help, ask!</p>
-<ul>
-    <li *ngFor="let post of posts">
-      <h2>Post ID: {{ post.id }}</h2>
-      <p>AuthorId: {{ post.author_id }}</p>
-      <p>Author: {{ post.content }}</p>
-    </li>
-  </ul>
+<p>Welcome to Heap Underflow! If you have any questions, ask!</p>
+
+<label for="name">Search: </label>
+
+<input type="text" id="name" name="name" required
+       minlength="1" maxlength="100" size="15">
+
+<mat-divider></mat-divider>
+       <section>
+       <div class="enter-button"></div>
+       <div class="button">
+              <button mat-raised-button color="accent">Enter</button>
+       </div>
+       </section>
+<mat-divider></mat-divider>
+
+<mat-card class="card">
+       <mat-card-header>
+         <div mat-card-avatar class="header-image"></div>
+         <mat-card-title>Recursion</mat-card-title>
+         <mat-card-subtitle>Programming Concepts</mat-card-subtitle>
+       </mat-card-header>
+       <img mat-card-image src="https://media.geeksforgeeks.org/wp-content/cdn-uploads/Recursive-Functions-in-c.png" alt="recursion image">
+       <mat-card-content>
+              <p>
+                     Recursion is a programming technique where a function calls itself repeatedly 
+                     until it reaches a certain condition or base case. In other words, recursion is 
+                     the process of solving a problem by breaking it down into smaller and smaller subproblems 
+                     until the subproblems become simple enough to be solved directly.
+              </p>
+       </mat-card-content>
+       <mat-card-actions>
+              <button mat-button>THUMBS UP</button>
+              <button mat-button>THUMBS DOWN</button>
+              <button mat-button>SEND</button>
+       </mat-card-actions>
+</mat-card>     
+
+<mat-card class="card">
+       <mat-card-header>
+         <div mat-card-avatar class="header-image"></div>
+         <mat-card-title>For Loop</mat-card-title>
+         <mat-card-subtitle>Programming Concepts</mat-card-subtitle>
+       </mat-card-header>
+       <img mat-card-image src="https://media.geeksforgeeks.org/wp-content/uploads/20191108131134/For-Loop.jpg" alt="for loop image">
+       <mat-card-content>
+              <p>
+                     A for loop is a type of loop control structure used in programming to repeat
+                      a set of instructions or statements a certain number of times.
+              </p>
+       </mat-card-content>
+       <mat-card-actions>
+              <button mat-button>THUMBS UP</button>
+              <button mat-button>THUMBS DOWN</button>
+              <button mat-button>SEND</button>
+       </mat-card-actions>
+</mat-card> 
