@@ -6,6 +6,11 @@
 - Added/modified unit tests to guarantee full backend functionality.
 
 ## Frontend
+- Created login page.
+- Created sign-up page.
+- Created thumb-up and thumb-down buttons.
+- Created share button.
+- Created post format.
 
 # Backend Unit Tests
 All backend unit test run using a local mongodb database with sample users, posts, and comments.
