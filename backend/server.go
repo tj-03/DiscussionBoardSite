@@ -5,13 +5,11 @@ import (
 	"os"
 	"time"
 
-	firebase "firebase.google.com/go"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
-	"google.golang.org/api/option"
 )
 
 type Server struct {
@@ -67,26 +65,27 @@ func (s *Server) Init(dbUrl string) {
 	}
 
 	//Set up firebase auth
-	opt := option.WithCredentialsFile("./firebaseKeys.json")
-	firebaseApp, err := firebase.NewApp(context.Background(), nil, opt)
-	if err != nil {
-		panic(err)
-	}
-	firebaseAuthClient, err := firebaseApp.Auth(context.Background())
-	if err != nil {
-		panic(err)
-	}
-	authProvider := NewFirebaseAuthProvider(firebaseAuthClient, db)
+	//opt := option.WithCredentialsFile("./firebaseKeys.json")
+	// firebaseApp, err := firebase.NewApp(context.Background(), nil, opt)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// firebaseAuthClient, err := firebaseApp.Auth(context.Background())
+	// if err != nil {
+	// 	panic(err)
+	// }
+	//authProvider := NewFirebaseAuthProvider(firebaseAuthClient, db)
 
 	postRepo := NewPostRepository(db)
 	userRepo := NewUserRepository(db)
 
 	s.Db = db
 
+	engine.Use(CorsMiddleWare())
 	engine.Use(static.Serve("/", static.LocalFile("../frontend/dist/discussion-board", false)))
 
 	apiGroup := engine.Group("api")
-	apiGroup.Use(authProvider.Middleware())
+	//apiGroup.Use(authProvider.Middleware())
 
 	//TODO:Abstract this into seperate function or interface/struct
 	//Get posts from user

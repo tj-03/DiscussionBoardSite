@@ -27,7 +27,7 @@ func (u *UserRepository) GetAllUsers() ([]User, error) {
 	if err != nil {
 		return nil, err
 	}
-	var users []User
+	users := []User{}
 	err = cursor.All(context.Background(), &users)
 	return users, err
 }
@@ -73,7 +73,7 @@ func (p *PostRepository) GetAllPosts() ([]Post, error) {
 	if err != nil {
 		return nil, err
 	}
-	var posts []Post
+	posts := []Post{}
 	err = cursor.All(context.Background(), &posts)
 	return posts, err
 }
@@ -83,7 +83,7 @@ func (p *PostRepository) GetAllPostsFromUserId(userId string) ([]Post, error) {
 	if err != nil {
 		return nil, err
 	}
-	var posts []Post
+	posts := []Post{}
 	err = cursor.All(context.Background(), &posts)
 	return posts, err
 }
