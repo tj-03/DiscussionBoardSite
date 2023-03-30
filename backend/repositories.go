@@ -22,6 +22,16 @@ func NewUserRepository(db *mongo.Database) UserRepository {
 	return UserRepository{coll: db.Collection("Users")}
 }
 
+func (u *UserRepository) GetAllUsers() ([]User, error) {
+	cursor, err := u.coll.Find(context.Background(), NoFilter)
+	if err != nil {
+		return nil, err
+	}
+	var users []User
+	err = cursor.All(context.Background(), &users)
+	return users, err
+}
+
 func (u *UserRepository) FindUser(id string) (User, error) {
 	user := User{}
 	err := u.coll.FindOne(context.Background(), User{UserId: id}).Decode(&user)
@@ -68,7 +78,7 @@ func (p *PostRepository) GetAllPosts() ([]Post, error) {
 	return posts, err
 }
 
-func (p *PostRepository) GetPostsFromUserId(userId string) ([]Post, error) {
+func (p *PostRepository) GetAllPostsFromUserId(userId string) ([]Post, error) {
 	cursor, err := p.coll.Find(context.Background(), Post{AuthorId: userId})
 	if err != nil {
 		return nil, err
@@ -76,6 +86,12 @@ func (p *PostRepository) GetPostsFromUserId(userId string) ([]Post, error) {
 	var posts []Post
 	err = cursor.All(context.Background(), &posts)
 	return posts, err
+}
+
+func (p *PostRepository) FindPostFromUserID(postId, userId string) (Post, error) {
+	post := Post{}
+	err := p.coll.FindOne(context.Background(), bson.M{"_id": postId, "author_id": userId}).Decode(&post)
+	return post, err
 }
 
 type Comment struct {
@@ -93,7 +109,7 @@ func NewCommentRepository(db *mongo.Database) CommentRepository {
 	return CommentRepository{coll: db.Collection("Comments")}
 }
 
-func (c *CommentRepository) AddCommet(comment Comment) error {
+func (c *CommentRepository) AddComment(comment Comment) error {
 	_, err := c.coll.InsertOne(context.Background(), comment)
 	return err
 }
@@ -106,4 +122,30 @@ func (c *CommentRepository) GetAllComments() ([]Comment, error) {
 	var comments []Comment
 	err = cursor.All(context.Background(), &comments)
 	return comments, err
+}
+
+func (c *CommentRepository) GetAllCommentsFromUserId(userId string) ([]Comment, error) {
+	cursor, err := c.coll.Find(context.Background(), Comment{Author: userId})
+	if err != nil {
+		return nil, err
+	}
+	var comments []Comment
+	err = cursor.All(context.Background(), &comments)
+	return comments, err
+}
+
+func (c *CommentRepository) GetAllCommentsFromPostId(postId string) ([]Comment, error) {
+	cursor, err := c.coll.Find(context.Background(), Comment{PostID: postId})
+	if err != nil {
+		return nil, err
+	}
+	var comments []Comment
+	err = cursor.All(context.Background(), &comments)
+	return comments, err
+}
+
+func (c *CommentRepository) FindComment(postId, commentId string) (Comment, error) {
+	comment := Comment{}
+	err := c.coll.FindOne(context.Background(), bson.M{"PostID": postId, "CommentID": commentId}).Decode(&comment)
+	return comment, err
 }

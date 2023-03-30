@@ -91,7 +91,7 @@ func (s *Server) Init(dbUrl string) {
 	//TODO:Abstract this into seperate function or interface/struct
 	//Get posts from user
 	apiGroup.GET("/user/posts/:id", func(c *gin.Context) {
-		posts, err := postRepo.GetPostsFromUserId(c.Param("id"))
+		posts, err := postRepo.GetAllPostsFromUserId(c.Param("id"))
 		if err != nil {
 			c.JSON(500, gin.H{"error": err.Error()})
 			return
@@ -135,7 +135,7 @@ func NewServer(dbUrl string) Server {
 	return s
 }
 
-//returns a server with a default router and mock data
+// returns a server with a default router and mock data
 func NewMockServer() Server {
 	var s Server
 	s.InitWithRouter(NewMockRouter())
