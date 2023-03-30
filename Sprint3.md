@@ -1,5 +1,6 @@
 # Work Completed
 
+
 ## Backend
 - Added retrieval functions for posts and users given different parameters.
 - Added functions to add or retreive comments.
@@ -14,6 +15,7 @@
 - Created thumb-up and thumb-down buttons.
 - Created share button.
 - Created post format.
+- Set up framework to ease integrating backend with frontend in future sprints
 
 # Backend Unit Tests
 All backend unit test run using a local mongodb database with sample users, posts, and comments.
