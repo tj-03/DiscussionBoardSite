@@ -3,13 +3,18 @@
 
     <div class="spacer"></div>
 
-    <a mat-button routerLink="homepage">Home</a>
-    <a mat-button routerLink="createpost">Create a Post</a>
-    <a mat-button routerLink="about">About the Team</a>
-    <a mat-raised-button color="accent" routerLink="login">Log in</a>
-    <div class="home">
-        <mat-icon matBadge="5" matBadgeColor="accent">home</mat-icon>
+    <a routerLink="homepage">
+    <div style = "position:relative; right:8px; top:4px;">
+        <div class="home">
+        <mat-icon matBadge="2" matBadgeColor="accent">home</mat-icon>
           <span class="cdk-visually-hidden">
           </span>
       </div>
+    </div>
+</a>
+
+    <a mat-button routerLink="createpost">Create Post</a>
+    <a mat-button routerLink="about">About the Team</a>
+    <a mat-raised-button color="accent" routerLink="login">Log in</a>
+    
 </mat-toolbar>

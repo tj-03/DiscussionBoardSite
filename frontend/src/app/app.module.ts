@@ -18,6 +18,7 @@ import {MatChipsModule} from '@angular/material/chips';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatBadgeModule} from '@angular/material/badge';
 import {MatIconModule} from '@angular/material/icon';
+import { SignupComponent } from './signup/signup.component';
 
 
 @NgModule({
@@ -29,6 +30,7 @@ import {MatIconModule} from '@angular/material/icon';
     LoginComponent,
     HomepageComponent,
     StepperComponent,
+    SignupComponent,
   ],
   imports: [
     BrowserModule,
