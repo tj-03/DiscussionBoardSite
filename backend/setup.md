@@ -10,7 +10,6 @@ To do this, cd to the DB_Init folder and run
     ```
     go run .
     ```
-    This will start a Mongo DB process if one has not started already and will create the necessary databases if they are not present. 
 
 2. In the backend folder run 
     ``` 
