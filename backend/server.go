@@ -81,6 +81,7 @@ func (s *Server) Init(dbUrl string) {
 
 	s.Db = db
 
+	engine.Use(CorsMiddleWare())
 	engine.Use(static.Serve("/", static.LocalFile("../frontend/dist/discussion-board", false)))
 
 	apiGroup := engine.Group("api")
