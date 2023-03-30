@@ -4,6 +4,9 @@
 - Added retrieval functions for posts and users given different parameters.
 - Added functions to add or retreive comments.
 - Added/modified unit tests to guarantee full backend functionality.
+- Created server setup documentation
+- Created Swagger API documentation
+- Updated endpoints to be consistent with Swagger documentation and ease frontend use 
 
 ## Frontend
 - Created login page.
