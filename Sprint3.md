@@ -41,6 +41,9 @@ All test pass.
 
 # Frontend Unit Tests
 
+- Signup: Ensures login button leads to the sign-up button which leads to the proper sign-up page.
+- HomeCall: Makes sure home page properly fetches posts from API.
+
 # Backend API Documentation
 https://github.com/tj-03/DiscussionBoardSite/tree/main/backend/docs/docs.html
 # Plan for Next Sprint
