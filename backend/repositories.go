@@ -48,6 +48,7 @@ type Post struct {
 	Title    string `json:"title" bson:"title,omitempty"`
 	AuthorId string `json:"author_id" bson:"author_id,omitempty"`
 	Content  string `json:"content" bson:"content,omitempty"`
+	Points   string `json:"points" bson:"points,omitempty"`
 }
 
 type PostRepository struct {
@@ -106,6 +107,7 @@ type Comment struct {
 	Author    string `json:"author" bson:"Author,omitempty"`
 	Body      string `json:"content" bson:"Body,omitempty"`
 	CommentID string `json:"comment_id" bson:"CommentID,omitempty"`
+	Points    string `json:"points" bson:"points,omitempty"`
 }
 
 type CommentRepository struct {
