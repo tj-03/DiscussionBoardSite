@@ -95,6 +95,12 @@ func (p *PostRepository) FindPostFromUserID(postId, userId string) (Post, error)
 	return post, err
 }
 
+func (p *PostRepository) FindPostFromTitle(title string) (Post, error) {
+	post := Post{}
+	err := p.coll.FindOne(context.Background(), bson.M{"title": title}).Decode(&post)
+	return post, err
+}
+
 type Comment struct {
 	PostID    string `json:"post_id" bson:"PostID,omitempty"`
 	Author    string `json:"author" bson:"Author,omitempty"`

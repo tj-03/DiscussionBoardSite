@@ -138,6 +138,22 @@ func TestGetPostFromUser(t *testing.T) {
 	}
 }
 
+func TestGetPostFromTitle(t *testing.T) {
+	title := "Title2"
+	db, _, err := getTestDb(os.Getenv("DB_URL"))
+	if err != nil {
+		t.Errorf("There was an error connecting to the database: %v", err)
+	}
+	postRepo := NewPostRepository(db)
+	post, err := postRepo.FindPostFromTitle(title)
+	if err != nil {
+		t.Errorf("There was an error getting the post: %v", err)
+	}
+	if post.Title != title {
+		t.Errorf("The post returned was not the one requested!")
+	}
+}
+
 func TestGetAllPostFromUser(t *testing.T) {
 	db, _, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
