@@ -27,21 +27,25 @@ func NewMockRouter() *gin.Engine {
 	posts := []Post{
 		Post{
 			ID:       "1",
+			Title:    "Title1",
 			AuthorId: "1",
 			Content:  "post1",
 		},
 		Post{
 			ID:       "2",
+			Title:    "Title2",
 			AuthorId: "1",
 			Content:  "post2",
 		},
 		Post{
 			ID:       "3",
+			Title:    "Title3",
 			AuthorId: "2",
 			Content:  "post3",
 		},
 		Post{
 			ID:       "4",
+			Title:    "Title4",
 			AuthorId: "2",
 			Content:  "post4",
 		},

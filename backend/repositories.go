@@ -45,6 +45,7 @@ func (u *UserRepository) CreateNewUser(user User) error {
 
 type Post struct {
 	ID       string `json:"id" bson:"_id,omitempty"`
+	Title    string `json:"title" bson:"title,omitempty"`
 	AuthorId string `json:"author_id" bson:"author_id,omitempty"`
 	Content  string `json:"content" bson:"content,omitempty"`
 }

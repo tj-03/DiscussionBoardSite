@@ -7,6 +7,7 @@ type User struct {
 
 type Post struct {
 	ID       string `json:"id" bson:"_id,omitempty"`
+	Title    string `json:"title" bson:"title,omitempty"`
 	AuthorId string `json:"author_id" bson:"author_id,omitempty"`
 	Content  string `json:"content" bson:"content,omitempty"`
 }
@@ -72,26 +73,31 @@ func createTestPosts() []Post {
 	return []Post{
 		{
 			ID:       "1",
+			Title:    "Title1",
 			AuthorId: "1",
 			Content:  "post1",
 		},
 		{
 			ID:       "2",
+			Title:    "Title2",
 			AuthorId: "1",
 			Content:  "post2",
 		},
 		{
 			ID:       "3",
+			Title:    "Title3",
 			AuthorId: "2",
 			Content:  "post3",
 		},
 		{
 			ID:       "4",
+			Title:    "Title4",
 			AuthorId: "2",
 			Content:  "post4",
 		},
 		{
 			ID:       "5",
+			Title:    "Title5",
 			AuthorId: "3",
 			Content:  "post5",
 		},
