@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"strconv"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -100,6 +101,26 @@ func (p *PostRepository) FindPostFromTitle(title string) (Post, error) {
 	post := Post{}
 	err := p.coll.FindOne(context.Background(), bson.M{"title": title}).Decode(&post)
 	return post, err
+}
+
+func (p *PostRepository) ThumbUp(ctx context.Context, postId string) {
+	post := Post{}
+	_ = p.coll.FindOne(context.Background(), bson.M{"_id": postId}).Decode(&post)
+	points, _ := strconv.Atoi(post.Points)
+	points++
+	filter := bson.D{{"_id", postId}}
+	update := bson.D{{"$set", bson.D{{"points", strconv.Itoa(points)}}}}
+	p.coll.UpdateOne(ctx, filter, update)
+}
+
+func (p *PostRepository) ThumbDown(ctx context.Context, postId string) {
+	post := Post{}
+	_ = p.coll.FindOne(context.Background(), bson.M{"_id": postId}).Decode(&post)
+	points, _ := strconv.Atoi(post.Points)
+	points--
+	filter := bson.D{{"_id", postId}}
+	update := bson.D{{"$set", bson.D{{"points", strconv.Itoa(points)}}}}
+	p.coll.UpdateOne(ctx, filter, update)
 }
 
 type Comment struct {

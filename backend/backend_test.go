@@ -90,13 +90,16 @@ func TestPostDoesNotExist(t *testing.T) {
 
 func TestAddPost(t *testing.T) {
 	postId := "123456789abcdef"
+	title := "newtitle"
 	author := "2"
 	body := "Add Post Test"
 
 	var nPost Post
 	nPost.AuthorId = author
+	nPost.Title = title
 	nPost.Content = body
 	nPost.ID = postId
+	nPost.Points = "0"
 
 	db, ctx, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
@@ -326,6 +329,7 @@ func TestAddComment(t *testing.T) {
 	nComment.Author = author
 	nComment.Body = body
 	nComment.CommentID = commentId
+	nComment.Points = "0"
 
 	db, ctx, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
