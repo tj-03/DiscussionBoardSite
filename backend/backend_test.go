@@ -187,6 +187,33 @@ func TestGetAllPostFromUser(t *testing.T) {
 	}
 }
 
+// Test upvoting and downvoting a post.
+func TestPostPoints(t *testing.T) {
+	postId := "1"
+	db, ctx, err := getTestDb(os.Getenv("DB_URL"))
+	if err != nil {
+		t.Errorf("There was an error connecting to the database: %v", err)
+	}
+	postRepo := NewPostRepository(db)
+	post, err := postRepo.FindPost(postId)
+	if err != nil {
+		t.Errorf("There was an error getting the post: %v", err)
+	}
+	if post.ID != postId {
+		t.Errorf("The comment returned was not the one requested!")
+	}
+	postRepo.ThumbUpPost(ctx, postId)
+	post, err = postRepo.FindPost(postId)
+	if post.Points != "1" {
+		t.Errorf("The upvote was not updated properly.")
+	}
+	postRepo.ThumbDownPost(ctx, postId)
+	post, err = postRepo.FindPost(postId)
+	if post.Points != "0" {
+		t.Errorf("The downvote was not updated properly.")
+	}
+}
+
 /*
 	Test functions related to users.
 */
