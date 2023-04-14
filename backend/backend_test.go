@@ -404,11 +404,13 @@ func TestCommentPoints(t *testing.T) {
 		t.Errorf("The comment returned was not the one requested!")
 	}
 	commentRepo.ThumbUpComment(ctx, postId, commentId)
+	comment, err = commentRepo.FindComment(postId, commentId)
 	if comment.Points != "1" {
-		t.Errorf("The points were not updated properly.")
+		t.Errorf("The upvote was not updated properly.")
 	}
 	commentRepo.ThumbDownComment(ctx, postId, commentId)
+	comment, err = commentRepo.FindComment(postId, commentId)
 	if comment.Points != "0" {
-		t.Errorf("The points were not updated properly.")
+		t.Errorf("The downvote was not updated properly.")
 	}
 }
