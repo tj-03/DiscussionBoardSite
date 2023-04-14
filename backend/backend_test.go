@@ -249,6 +249,24 @@ func TestGetUser(t *testing.T) {
 	}
 }
 
+// test getting a user using the user ID.
+func TestGetUserByUsername(t *testing.T) {
+	username := "user3"
+	userid := "3"
+	db, _, err := getTestDb(os.Getenv("DB_URL"))
+	if err != nil {
+		t.Errorf("There was an error connecting to the database: %v", err)
+	}
+	userRepo := NewUserRepository(db)
+	user, err := userRepo.FindUsername(username)
+	if err != nil {
+		t.Errorf("There was an error getting the user: %v", err)
+	}
+	if user.UserId != userid {
+		t.Errorf("The user returned was not the one requested!")
+	}
+}
+
 // Test getting a user that does not exist
 func TestGetUserThatDoesNotExist(t *testing.T) {
 	userId := "100000"

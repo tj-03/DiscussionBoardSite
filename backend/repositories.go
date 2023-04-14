@@ -44,6 +44,12 @@ func (u *UserRepository) CreateNewUser(user User) error {
 	return err
 }
 
+func (u *UserRepository) FindUsername(username string) (User, error) {
+	user := User{}
+	err := u.coll.FindOne(context.Background(), User{Username: username}).Decode(&user)
+	return user, err
+}
+
 type Post struct {
 	ID       string `json:"id" bson:"_id,omitempty"`
 	Title    string `json:"title" bson:"title,omitempty"`
