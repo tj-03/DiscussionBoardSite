@@ -103,7 +103,7 @@ func (p *PostRepository) FindPostFromTitle(title string) (Post, error) {
 	return post, err
 }
 
-func (p *PostRepository) ThumbUp(ctx context.Context, postId string) {
+func (p *PostRepository) ThumbUpPost(ctx context.Context, postId string) {
 	post := Post{}
 	_ = p.coll.FindOne(context.Background(), bson.M{"_id": postId}).Decode(&post)
 	points, _ := strconv.Atoi(post.Points)
@@ -113,7 +113,7 @@ func (p *PostRepository) ThumbUp(ctx context.Context, postId string) {
 	p.coll.UpdateOne(ctx, filter, update)
 }
 
-func (p *PostRepository) ThumbDown(ctx context.Context, postId string) {
+func (p *PostRepository) ThumbDownPost(ctx context.Context, postId string) {
 	post := Post{}
 	_ = p.coll.FindOne(context.Background(), bson.M{"_id": postId}).Decode(&post)
 	points, _ := strconv.Atoi(post.Points)
@@ -178,4 +178,24 @@ func (c *CommentRepository) FindComment(postId, commentId string) (Comment, erro
 	comment := Comment{}
 	err := c.coll.FindOne(context.Background(), bson.M{"PostID": postId, "CommentID": commentId}).Decode(&comment)
 	return comment, err
+}
+
+func (c *CommentRepository) ThumbUpComment(ctx context.Context, postId, commentId string) {
+	comment := Comment{}
+	_ = c.coll.FindOne(context.Background(), bson.M{"PostID": postId, "CommentID": commentId}).Decode(&comment)
+	points, _ := strconv.Atoi(comment.Points)
+	points++
+	filter := bson.D{{"PostID", postId}, {"CommentID", commentId}}
+	update := bson.D{{"$set", bson.D{{"points", strconv.Itoa(points)}}}}
+	c.coll.UpdateOne(ctx, filter, update)
+}
+
+func (c *CommentRepository) ThumbDownComment(ctx context.Context, postId, commentId string) {
+	comment := Comment{}
+	_ = c.coll.FindOne(context.Background(), bson.M{"PostID": postId, "CommentID": commentId}).Decode(&comment)
+	points, _ := strconv.Atoi(comment.Points)
+	points--
+	filter := bson.D{{"PostID", postId}, {"CommentID", commentId}}
+	update := bson.D{{"$set", bson.D{{"points", strconv.Itoa(points)}}}}
+	c.coll.UpdateOne(ctx, filter, update)
 }

@@ -14,6 +14,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
+/*
+	Initialize the test database and populate data.
+*/
+
 func init() {
 	godotenv.Load("dev.env")
 }
@@ -45,6 +49,12 @@ func getTestDb(dbUrl string) (*mongo.Database, context.Context, error) {
 	}
 	return db, ctx, nil
 }
+
+/*
+	Test funcitons related to posts.
+*/
+
+// Test getting all posts in the database.
 func TestGetAllPosts(t *testing.T) {
 	db, _, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
@@ -58,6 +68,7 @@ func TestGetAllPosts(t *testing.T) {
 	}
 }
 
+// Test getting a post using the post ID.
 func TestGetExistingPost(t *testing.T) {
 	postId := "1"
 	db, _, err := getTestDb(os.Getenv("DB_URL"))
@@ -74,6 +85,7 @@ func TestGetExistingPost(t *testing.T) {
 	}
 }
 
+// Test system response to nonexistant post.
 func TestPostDoesNotExist(t *testing.T) {
 	postId := "100000"
 	db, _, err := getTestDb(os.Getenv("DB_URL"))
@@ -88,6 +100,7 @@ func TestPostDoesNotExist(t *testing.T) {
 
 }
 
+// Test function for adding a post. Deletes test post after test has passed.
 func TestAddPost(t *testing.T) {
 	postId := "123456789abcdef"
 	title := "newtitle"
@@ -124,6 +137,7 @@ func TestAddPost(t *testing.T) {
 	postRepo.coll.DeleteOne(ctx, bson.D{{"_id", "123456789abcdef"}})
 }
 
+// Test getting a post using the user ID.
 func TestGetPostFromUser(t *testing.T) {
 	postId := "1"
 	userId := "1"
@@ -141,6 +155,7 @@ func TestGetPostFromUser(t *testing.T) {
 	}
 }
 
+// Test getting a post using the post's title.
 func TestGetPostFromTitle(t *testing.T) {
 	title := "Title2"
 	db, _, err := getTestDb(os.Getenv("DB_URL"))
@@ -157,6 +172,7 @@ func TestGetPostFromTitle(t *testing.T) {
 	}
 }
 
+// Test getting all posts from a single user.
 func TestGetAllPostFromUser(t *testing.T) {
 	db, _, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
@@ -170,6 +186,12 @@ func TestGetAllPostFromUser(t *testing.T) {
 		t.Errorf("Incorrect number of posts returned!")
 	}
 }
+
+/*
+	Test functions related to users.
+*/
+
+// Test getting all users in database.
 func TestGetAllUser(t *testing.T) {
 	db, _, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
@@ -183,7 +205,7 @@ func TestGetAllUser(t *testing.T) {
 	}
 }
 
-// test getting a user
+// test getting a user using the user ID.
 func TestGetUser(t *testing.T) {
 	userId := "1"
 	db, _, err := getTestDb(os.Getenv("DB_URL"))
@@ -200,7 +222,7 @@ func TestGetUser(t *testing.T) {
 	}
 }
 
-// test getting a user that does not exist
+// Test getting a user that does not exist
 func TestGetUserThatDoesNotExist(t *testing.T) {
 	userId := "100000"
 	db, _, err := getTestDb(os.Getenv("DB_URL"))
@@ -214,6 +236,7 @@ func TestGetUserThatDoesNotExist(t *testing.T) {
 	}
 }
 
+// Test function to add a user.
 func TestAddUser(t *testing.T) {
 	userId := "123456789abcdef"
 	name := "TestAddUser"
@@ -245,6 +268,11 @@ func TestAddUser(t *testing.T) {
 	userRepo.coll.DeleteOne(ctx, bson.D{{"_id", userId}})
 }
 
+/*
+	Test functions related to comments.
+*/
+
+// Test getting all comments from database.
 func TestGetAllComments(t *testing.T) {
 	db, _, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
@@ -258,6 +286,7 @@ func TestGetAllComments(t *testing.T) {
 	}
 }
 
+// Test get all comments from a single user.
 func TestGetAllCommentsFromUser(t *testing.T) {
 	db, _, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
@@ -272,6 +301,7 @@ func TestGetAllCommentsFromUser(t *testing.T) {
 	}
 }
 
+// Test getting all comments on a single post.
 func TestGetAllCommentsFromPost(t *testing.T) {
 	db, _, err := getTestDb(os.Getenv("DB_URL"))
 	if err != nil {
@@ -286,6 +316,7 @@ func TestGetAllCommentsFromPost(t *testing.T) {
 	}
 }
 
+// Test getting a comment using the comment ID.
 func TestGetExistingComment(t *testing.T) {
 	postId := "1"
 	commentId := "1"
@@ -303,6 +334,7 @@ func TestGetExistingComment(t *testing.T) {
 	}
 }
 
+// Test system response to getting a nonexistant comment.
 func TestCommentDoesNotExist(t *testing.T) {
 	postId := "1"
 	commentId := "3"
@@ -318,6 +350,7 @@ func TestCommentDoesNotExist(t *testing.T) {
 
 }
 
+// Test function to add a comment.
 func TestAddComment(t *testing.T) {
 	postId := "3"
 	author := "4"
@@ -352,4 +385,30 @@ func TestAddComment(t *testing.T) {
 	}
 
 	commentRepo.coll.DeleteOne(ctx, bson.D{{"PostID", "3"}, {"CommentID", commentId}})
+}
+
+// Test upvoting and downvoting a comment.
+func TestCommentPoints(t *testing.T) {
+	postId := "1"
+	commentId := "1"
+	db, ctx, err := getTestDb(os.Getenv("DB_URL"))
+	if err != nil {
+		t.Errorf("There was an error connecting to the database: %v", err)
+	}
+	commentRepo := NewCommentRepository(db)
+	comment, err := commentRepo.FindComment(postId, commentId)
+	if err != nil {
+		t.Errorf("There was an error getting the post: %v", err)
+	}
+	if comment.CommentID != commentId {
+		t.Errorf("The comment returned was not the one requested!")
+	}
+	commentRepo.ThumbUpComment(ctx, postId, commentId)
+	if comment.Points != "1" {
+		t.Errorf("The points were not updated properly.")
+	}
+	commentRepo.ThumbDownComment(ctx, postId, commentId)
+	if comment.Points != "0" {
+		t.Errorf("The points were not updated properly.")
+	}
 }
