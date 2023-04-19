@@ -12,7 +12,7 @@ import { AuthService } from '../services/auth.service';
 
 export class HomepageComponent implements OnInit {
   posts: any;
-  constructor(private httpClient: HttpClient, private auth: AuthService) {
+  constructor(private httpClient: HttpClient) {
     this.posts = [];
   }
 
@@ -20,8 +20,6 @@ export class HomepageComponent implements OnInit {
   ngOnInit() {
     let url = 'http://localhost:8080/api';
     let header = new HttpHeaders();
-    let token = this.auth.userData.userToken!;
-    header = header.set('Authorization', token);
     this.httpClient.get('http://localhost:8080/api/posts', {
       headers: header
     }).subscribe((posts : Object) => {

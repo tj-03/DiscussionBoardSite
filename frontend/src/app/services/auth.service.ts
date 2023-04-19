@@ -23,7 +23,14 @@ export class AuthService {
     userToken: null
   }
   constructor(public authService: AngularFireAuth, private router: Router) {
-    this.userData = JSON.parse(localStorage.getItem('userData') || 'null');
+    let emptyUserData = `
+      {
+        "userId": null,
+        "userName": null,
+        "userToken": null
+      }
+    `
+    this.userData = JSON.parse(localStorage.getItem('userData') || emptyUserData);
     this.authService.authState.subscribe(user => {
       user?.getIdToken().then((token) => {
         if (token) {
@@ -65,7 +72,11 @@ export class AuthService {
   logout(){
     return this.authService.signOut().then(() => {
       localStorage.removeItem('userData');
-      this.router.navigate(['sign-in']);
+      this.userData = {
+        userId: null,
+        userName: null,
+        userToken: null
+      }
     });
   }
 }
