@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 
 	"firebase.google.com/go/auth"
@@ -34,9 +35,15 @@ func (provider *FirebaseAuthProvider) Middleware() gin.HandlerFunc {
 		}
 
 		_, err = provider.users.FindUser(token.UID)
-		if err == mongo.ErrNilDocument {
-			c.AbortWithStatusJSON(401, "User does not exist")
-			//create user
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			//c.AbortWithStatusJSON(401, "User does not exist")
+			u, err := provider.FirebaseClient.GetUser(c, token.UID)
+			if err != nil {
+				c.AbortWithStatusJSON(401, "User does not exist")
+				return
+			}
+			email := u.Email
+			provider.users.CreateNewUser(User{UserId: token.UID, Username: email})
 			return
 		}
 		c.Next()
