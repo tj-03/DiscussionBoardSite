@@ -2,14 +2,17 @@ package main
 
 import (
 	"context"
+	"errors"
 	"os"
 	"time"
 
+	firebase "firebase.google.com/go"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"google.golang.org/api/option"
 )
 
 type Server struct {
@@ -65,16 +68,16 @@ func (s *Server) Init(dbUrl string) {
 	}
 
 	//Set up firebase auth
-	//opt := option.WithCredentialsFile("./firebaseKeys.json")
-	// firebaseApp, err := firebase.NewApp(context.Background(), nil, opt)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// firebaseAuthClient, err := firebaseApp.Auth(context.Background())
-	// if err != nil {
-	// 	panic(err)
-	// }
-	//authProvider := NewFirebaseAuthProvider(firebaseAuthClient, db)
+	opt := option.WithCredentialsFile("./firebaseKeys.json")
+	firebaseApp, err := firebase.NewApp(context.Background(), nil, opt)
+	if err != nil {
+		panic(err)
+	}
+	firebaseAuthClient, err := firebaseApp.Auth(context.Background())
+	if err != nil {
+		panic(err)
+	}
+	authProvider := NewFirebaseAuthProvider(firebaseAuthClient, db)
 
 	postRepo := NewPostRepository(db)
 	userRepo := NewUserRepository(db)
@@ -84,12 +87,13 @@ func (s *Server) Init(dbUrl string) {
 	engine.Use(CorsMiddleWare())
 	engine.Use(static.Serve("/", static.LocalFile("../frontend/dist/discussion-board", false)))
 
-	apiGroup := engine.Group("api")
-	//apiGroup.Use(authProvider.Middleware())
+	authApiGroup := engine.Group("api")
+	noAuthApiGroup := engine.Group("api")
+	authApiGroup.Use(authProvider.Middleware())
 
 	//TODO:Abstract this into seperate function or interface/struct
 	//Get posts from user
-	apiGroup.GET("/user/posts/:id", func(c *gin.Context) {
+	noAuthApiGroup.GET("/user/posts/:id", func(c *gin.Context) {
 		posts, err := postRepo.GetAllPostsFromUserId(c.Param("id"))
 		if err != nil {
 			c.JSON(500, gin.H{"error": err.Error()})
@@ -99,7 +103,7 @@ func (s *Server) Init(dbUrl string) {
 	})
 
 	//Get all posts
-	apiGroup.GET("/posts", func(c *gin.Context) {
+	noAuthApiGroup.GET("/posts", func(c *gin.Context) {
 		posts, err := postRepo.GetAllPosts()
 		if err != nil {
 			c.JSON(500, gin.H{"error": err.Error()})
@@ -109,8 +113,12 @@ func (s *Server) Init(dbUrl string) {
 	})
 
 	//Get user profile
-	apiGroup.GET("/user/:id", func(c *gin.Context) {
+	noAuthApiGroup.GET("/user/:id", func(c *gin.Context) {
 		user, err := userRepo.FindUser(c.Param("id"))
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			c.JSON(404, gin.H{"error": "user not found"})
+			return
+		}
 		if err != nil {
 			c.JSON(500, gin.H{"error": err.Error()})
 			return
@@ -118,6 +126,39 @@ func (s *Server) Init(dbUrl string) {
 		c.JSON(200, user)
 	})
 
+	authApiGroup.POST("/post", func(c *gin.Context) {
+		var post Post
+		err := c.BindJSON(&post)
+		if err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+		if len(post.AuthorId) == 0 {
+			c.JSON(400, gin.H{"error": "post failed, no author id"})
+			return
+		}
+		if len(post.Content) == 0 {
+			c.JSON(400, gin.H{"error": "post failed, no content"})
+			return
+		}
+		user, err := userRepo.FindUser(post.AuthorId)
+		println(user.UserId)
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			c.JSON(404, gin.H{"error": "post failed, user not found"})
+			return
+		}
+		if err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+
+		err = postRepo.AddPost(post)
+		if err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(200, gin.H{"message": "success"})
+	})
 	s.Engine = engine
 }
 
