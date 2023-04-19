@@ -20,8 +20,19 @@ import {MatBadgeModule} from '@angular/material/badge';
 import {MatIconModule} from '@angular/material/icon';
 import { SignupComponent } from './signup/signup.component';
 import { HttpClientModule } from '@angular/common/http';
+import {AngularFireModule} from '@angular/fire/compat';
+import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+import { FormsModule } from '@angular/forms';
 
-
+const firebaseConfig = {
+  apiKey: "AIzaSyAHzbLjsiQswNjy45AAqsG0MHJU-iibdl4",
+  authDomain: "groupproject-333e4.firebaseapp.com",
+  projectId: "groupproject-333e4",
+  storageBucket: "groupproject-333e4.appspot.com",
+  messagingSenderId: "345612458789",
+  appId: "1:345612458789:web:40d1daf0c95280400dd8cc",
+  measurementId: "G-PKJVPSEBT6"
+};
 @NgModule({
   declarations: [
     AppComponent,
@@ -45,7 +56,10 @@ import { HttpClientModule } from '@angular/common/http';
     MatDividerModule,
     MatBadgeModule,
     MatIconModule,
-    HttpClientModule
+    HttpClientModule,
+    AngularFireModule.initializeApp(firebaseConfig),
+    AngularFireAuthModule,
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

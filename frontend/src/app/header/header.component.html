@@ -15,6 +15,11 @@
 
     <a mat-button routerLink="createpost">Create Post</a>
     <a mat-button routerLink="about">About the Team</a>
-    <a mat-raised-button color="accent" routerLink="login">Log in</a>
-    
+    <ng-container *ngIf = "auth.userData.userToken != null">
+        <a  mat-raised-button color="accent" (click) = "auth.logout()">Log out</a>
+    </ng-container>
+    <ng-container *ngIf = "auth.userData.userToken == null" >
+         <a mat-raised-button color="accent" (click) = "auth.login()">Log in</a>
+    </ng-container>
+
 </mat-toolbar>
