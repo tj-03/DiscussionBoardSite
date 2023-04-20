@@ -5,6 +5,25 @@
 - Post content and comments now show up in individual dialog box
 - Dark mode
 
+## Issues Worked On
+- Added/adjusted spacers.
+- Adjusted text size across the program.
+- "Log in" button text updated.
+- Fixed text alignment and spacing.
+
+## New Functionality Implemented
+- Added button functionality to the title in the top left.
+- Implemented dark mode across entire program.
+
+## Tests Created
+- Logo
+- Log in
+- AboutTeam
+
+### Passed? Y/N
+All tests passed.
+
+
 # BackEnd
 - Added endpoints for searching posts/users
 - Added endpoints for replying to posts
