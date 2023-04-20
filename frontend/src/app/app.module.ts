@@ -11,7 +11,7 @@ import { AboutteamComponent } from './aboutteam/aboutteam.component';
 import { CreatepostComponent } from './createpost/createpost.component';
 import {MatInputModule} from '@angular/material/input';
 import { LoginComponent } from './login/login.component';
-import { HomepageComponent } from './homepage/homepage.component';
+import { DialogContentExampleDialog, HomepageComponent } from './homepage/homepage.component';
 import { StepperComponent } from './stepper/stepper.component';
 import {MatCardModule} from '@angular/material/card';
 import {MatChipsModule} from '@angular/material/chips';
@@ -23,6 +23,7 @@ import { HttpClientModule } from '@angular/common/http';
 import {AngularFireModule} from '@angular/fire/compat';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import { FormsModule } from '@angular/forms';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAHzbLjsiQswNjy45AAqsG0MHJU-iibdl4",
@@ -43,6 +44,7 @@ const firebaseConfig = {
     HomepageComponent,
     StepperComponent,
     SignupComponent,
+    DialogContentExampleDialog
   ],
   imports: [
     BrowserModule,
@@ -56,6 +58,7 @@ const firebaseConfig = {
     MatDividerModule,
     MatBadgeModule,
     MatIconModule,
+    MatDialogModule,
     HttpClientModule,
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFireAuthModule,
