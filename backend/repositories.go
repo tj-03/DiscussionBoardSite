@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -55,7 +56,7 @@ type Post struct {
 	Title    string `json:"title" bson:"title,omitempty"`
 	AuthorId string `json:"author_id" bson:"author_id,omitempty"`
 	Content  string `json:"content" bson:"content,omitempty"`
-	Points   string `json:"points" bson:"points,omitempty"`
+	Points   int    `json:"points" bson:"points,omitempty"`
 }
 
 type PostRepository struct {
@@ -73,7 +74,11 @@ func (p *PostRepository) AddPost(post Post) error {
 
 func (p *PostRepository) FindPost(postId string) (Post, error) {
 	post := Post{}
-	err := p.coll.FindOne(context.Background(), bson.M{"_id": postId}).Decode(&post)
+	objId, err := primitive.ObjectIDFromHex(postId)
+	if err != nil {
+		return post, err
+	}
+	err = p.coll.FindOne(context.Background(), bson.M{"_id": objId}).Decode(&post)
 	return post, err
 }
 
@@ -109,31 +114,39 @@ func (p *PostRepository) FindPostFromTitle(title string) (Post, error) {
 	return post, err
 }
 
-func (p *PostRepository) ThumbUpPost(ctx context.Context, postId string) {
+func (p *PostRepository) ThumbUpPost(ctx context.Context, postId string) error {
 	post := Post{}
-	_ = p.coll.FindOne(context.Background(), bson.M{"_id": postId}).Decode(&post)
-	points, _ := strconv.Atoi(post.Points)
+	err := p.coll.FindOne(context.Background(), bson.M{"_id": postId}).Decode(&post)
+	if err != nil {
+		return err
+	}
+	points := post.Points
 	points++
 	filter := bson.D{{"_id", postId}}
-	update := bson.D{{"$set", bson.D{{"points", strconv.Itoa(points)}}}}
-	p.coll.UpdateOne(ctx, filter, update)
+	update := bson.D{{"$set", bson.D{{"points", points}}}}
+	_, err = p.coll.UpdateOne(ctx, filter, update)
+	return err
 }
 
-func (p *PostRepository) ThumbDownPost(ctx context.Context, postId string) {
+func (p *PostRepository) ThumbDownPost(ctx context.Context, postId string) error {
 	post := Post{}
-	_ = p.coll.FindOne(context.Background(), bson.M{"_id": postId}).Decode(&post)
-	points, _ := strconv.Atoi(post.Points)
+	err := p.coll.FindOne(context.Background(), bson.M{"_id": postId}).Decode(&post)
+	if err != nil {
+		return err
+	}
+	points := post.Points
 	points--
 	filter := bson.D{{"_id", postId}}
-	update := bson.D{{"$set", bson.D{{"points", strconv.Itoa(points)}}}}
-	p.coll.UpdateOne(ctx, filter, update)
+	update := bson.D{{"$set", bson.D{{"points", points}}}}
+	_, err = p.coll.UpdateOne(ctx, filter, update)
+	return err
 }
 
 type Comment struct {
 	PostID    string `json:"post_id" bson:"PostID,omitempty"`
-	Author    string `json:"author" bson:"Author,omitempty"`
+	AuthorId  string `json:"author_id" bson:"Author,omitempty"`
 	Body      string `json:"content" bson:"Body,omitempty"`
-	CommentID string `json:"comment_id" bson:"CommentID,omitempty"`
+	CommentID string `json:"comment_id" bson:"_id,omitempty"`
 	Points    string `json:"points" bson:"points,omitempty"`
 }
 
@@ -161,7 +174,7 @@ func (c *CommentRepository) GetAllComments() ([]Comment, error) {
 }
 
 func (c *CommentRepository) GetAllCommentsFromUserId(userId string) ([]Comment, error) {
-	cursor, err := c.coll.Find(context.Background(), Comment{Author: userId})
+	cursor, err := c.coll.Find(context.Background(), Comment{AuthorId: userId})
 	if err != nil {
 		return nil, err
 	}
@@ -186,22 +199,30 @@ func (c *CommentRepository) FindComment(postId, commentId string) (Comment, erro
 	return comment, err
 }
 
-func (c *CommentRepository) ThumbUpComment(ctx context.Context, postId, commentId string) {
+func (c *CommentRepository) ThumbUpComment(ctx context.Context, postId, commentId string) error {
 	comment := Comment{}
-	_ = c.coll.FindOne(context.Background(), bson.M{"PostID": postId, "CommentID": commentId}).Decode(&comment)
+	err := c.coll.FindOne(context.Background(), bson.M{"PostID": postId, "CommentID": commentId}).Decode(&comment)
+	if err != nil {
+		return err
+	}
 	points, _ := strconv.Atoi(comment.Points)
 	points++
 	filter := bson.D{{"PostID", postId}, {"CommentID", commentId}}
 	update := bson.D{{"$set", bson.D{{"points", strconv.Itoa(points)}}}}
-	c.coll.UpdateOne(ctx, filter, update)
+	_, err = c.coll.UpdateOne(ctx, filter, update)
+	return err
 }
 
-func (c *CommentRepository) ThumbDownComment(ctx context.Context, postId, commentId string) {
+func (c *CommentRepository) ThumbDownComment(ctx context.Context, postId, commentId string) error {
 	comment := Comment{}
-	_ = c.coll.FindOne(context.Background(), bson.M{"PostID": postId, "CommentID": commentId}).Decode(&comment)
+	err := c.coll.FindOne(context.Background(), bson.M{"PostID": postId, "CommentID": commentId}).Decode(&comment)
+	if err != nil {
+		return err
+	}
 	points, _ := strconv.Atoi(comment.Points)
 	points--
 	filter := bson.D{{"PostID", postId}, {"CommentID", commentId}}
 	update := bson.D{{"$set", bson.D{{"points", strconv.Itoa(points)}}}}
-	c.coll.UpdateOne(ctx, filter, update)
+	_, err = c.coll.UpdateOne(ctx, filter, update)
+	return err
 }

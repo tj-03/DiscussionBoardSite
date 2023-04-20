@@ -30,28 +30,28 @@ func NewMockRouter() *gin.Engine {
 			Title:    "Title1",
 			AuthorId: "1",
 			Content:  "post1",
-			Points:   "0",
+			Points:   0,
 		},
 		Post{
 			ID:       "2",
 			Title:    "Title2",
 			AuthorId: "1",
 			Content:  "post2",
-			Points:   "0",
+			Points:   0,
 		},
 		Post{
 			ID:       "3",
 			Title:    "Title3",
 			AuthorId: "2",
 			Content:  "post3",
-			Points:   "0",
+			Points:   0,
 		},
 		Post{
 			ID:       "4",
 			Title:    "Title4",
 			AuthorId: "2",
 			Content:  "post4",
-			Points:   "0",
+			Points:   0,
 		},
 	}
 	/*

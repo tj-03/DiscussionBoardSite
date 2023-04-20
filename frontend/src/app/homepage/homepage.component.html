@@ -6,14 +6,33 @@
        <label for="name">Search: </label>
        <input type="text" id="name" name="name" required
        minlength="1" maxlength="100" size="15">
-<div class="button" style="position:relative; left:15px;">
-       <button mat-raised-button color="accent">Enter</button>
-</div>
-<ul>
-       <div style="position:relative; right:10px;">
-       <li *ngFor="let post of posts">
-         <p>User: {{ post.author?.name }}</p>
-         <p>Content: {{post.content}}</p>
-       </li>
-</div>
-</ul>
+
+<mat-divider></mat-divider>
+       <section>
+       <div class="enter-button"></div>
+       <div class="button">
+              <button mat-raised-button color="accent">Enter</button>
+       </div>
+       </section>
+<mat-divider></mat-divider>
+
+
+<mat-card *ngFor = "let post of posts; let i = index" class="post-box" (click) = "openDialog(i)">
+       <mat-card-header class = "post-header post-box-title">
+              <mat-card-title>{{post.title}}</mat-card-title>
+              <mat-card-subtitle>by {{post.author?.name}}</mat-card-subtitle>
+       </mat-card-header>
+       <!-- <mat-card-content class="post-box-content">
+              <p>
+              {{post.content}}}
+              </p>
+       </mat-card-content> -->
+       <mat-card-actions>
+              <button mat-button>LIKE</button>
+              <button mat-button>COMMENT</button>
+       </mat-card-actions>
+       <mat-card-content>
+              {{post.points}} likes
+       </mat-card-content>
+</mat-card>
+
