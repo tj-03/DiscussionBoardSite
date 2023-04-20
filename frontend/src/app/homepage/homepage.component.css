@@ -36,3 +36,8 @@
   display: flex;
   justify-content: space-between;
 }
+
+.comment-area{
+  overflow-y: scroll;
+  max-height: 30vh;
+}

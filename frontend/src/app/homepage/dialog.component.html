@@ -1,13 +1,16 @@
 <h2 mat-dialog-title>{{post.title}}</h2>
 <mat-dialog-content class="mat-typography">
-  <p>{{post.content}}</p>
+  <p style = "color:white">{{post.content}}</p>
 </mat-dialog-content>
 
-<h1 mat-dialog-title>Comments: ({{comments.length}})</h1>
+<div class = "comment-area">
+  <h1 mat-dialog-title>Comments: ({{comments.length}})</h1>
 <mat-dialog-content *ngFor = "let comment of comments" class="mat-typography">
   <mat-card-subtitle>Username: {{comment.author?.name}}</mat-card-subtitle>
   <p>{{comment.content}}</p>
 </mat-dialog-content>
+</div>
+
 
 <mat-form-field class="comment-box">
 <mat-dialog-actions align="end">
