@@ -1,14 +1,10 @@
+<p></p>
+<p>
 <mat-form-field class="example-full-width">
        <mat-label>Create a post:</mat-label>
-       <textarea matInput [(ngModel)] = "postContent" placeholder="Ex. What is an int?"></textarea>
+       <textarea matInput [(ngModel)] = "postContent" placeholder="Ex: What is an int?"></textarea>
 </mat-form-field>
-
-<mat-divider></mat-divider>
-       <section>
-       <div class="enter-button"></div>
        <div class="button">
+              <p>
               <button (click) = "submitPost()" mat-raised-button color="accent">Post</button>
        </div>
-       </section>
-<mat-divider></mat-divider>
-
