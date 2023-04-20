@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"log"
 	"os"
 	"time"
 
@@ -16,8 +17,11 @@ import (
 )
 
 type Server struct {
-	Engine *gin.Engine
-	Db     *mongo.Database
+	Engine      *gin.Engine
+	Db          *mongo.Database
+	UserRepo    UserRepository
+	PostRepo    PostRepository
+	CommentRepo CommentRepository
 }
 
 func CorsMiddleWare() gin.HandlerFunc {
@@ -61,10 +65,10 @@ func (s *Server) Init(dbUrl string) {
 	engine := gin.Default()
 	db, err := getDbConn(dbUrl)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	if db == nil {
-		panic("db is nil")
+		log.Fatal("db is nil")
 	}
 
 	//Set up firebase auth
@@ -79,8 +83,9 @@ func (s *Server) Init(dbUrl string) {
 	}
 	authProvider := NewFirebaseAuthProvider(firebaseAuthClient, db)
 
-	postRepo := NewPostRepository(db)
-	userRepo := NewUserRepository(db)
+	s.PostRepo = NewPostRepository(db)
+	s.UserRepo = NewUserRepository(db)
+	s.CommentRepo = NewCommentRepository(db)
 
 	s.Db = db
 
@@ -90,75 +95,16 @@ func (s *Server) Init(dbUrl string) {
 	authApiGroup := engine.Group("api")
 	noAuthApiGroup := engine.Group("api")
 	authApiGroup.Use(authProvider.Middleware())
-
-	//TODO:Abstract this into seperate function or interface/struct
 	//Get posts from user
-	noAuthApiGroup.GET("/user/posts/:id", func(c *gin.Context) {
-		posts, err := postRepo.GetAllPostsFromUserId(c.Param("id"))
-		if err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
-		}
-		c.JSON(200, posts)
-	})
-
+	noAuthApiGroup.GET("/user/posts/:id", s.GetPostsFromUserId)
 	//Get all posts
-	noAuthApiGroup.GET("/posts", func(c *gin.Context) {
-		posts, err := postRepo.GetAllPosts()
-		if err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
-		}
-		c.JSON(200, posts)
-	})
-
+	noAuthApiGroup.GET("/posts", s.GetAllPosts)
 	//Get user profile
-	noAuthApiGroup.GET("/user/:id", func(c *gin.Context) {
-		user, err := userRepo.FindUser(c.Param("id"))
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			c.JSON(404, gin.H{"error": "user not found"})
-			return
-		}
-		if err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
-		}
-		c.JSON(200, user)
-	})
-
-	authApiGroup.POST("/post", func(c *gin.Context) {
-		var post Post
-		err := c.BindJSON(&post)
-		if err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
-		}
-		if len(post.AuthorId) == 0 {
-			c.JSON(400, gin.H{"error": "post failed, no author id"})
-			return
-		}
-		if len(post.Content) == 0 {
-			c.JSON(400, gin.H{"error": "post failed, no content"})
-			return
-		}
-		user, err := userRepo.FindUser(post.AuthorId)
-		println(user.UserId)
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			c.JSON(404, gin.H{"error": "post failed, user not found"})
-			return
-		}
-		if err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
-		}
-
-		err = postRepo.AddPost(post)
-		if err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
-		}
-		c.JSON(200, gin.H{"message": "success"})
-	})
+	noAuthApiGroup.GET("/user/:id", s.GetUser)
+	authApiGroup.POST("/post", s.CreatePost)
+	//Get comments
+	noAuthApiGroup.GET("/post/comments/:id", s.GetCommentsFromPostId)
+	authApiGroup.POST("/post/comment", s.CreateComment)
 	s.Engine = engine
 }
 
@@ -173,6 +119,132 @@ func NewServer(dbUrl string) Server {
 	var s Server
 	s.Init(dbUrl)
 	return s
+}
+
+func (s *Server) GetUser(c *gin.Context) {
+	user, err := s.UserRepo.FindUser(c.Param("id"))
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		c.JSON(404, gin.H{"error": "user not found"})
+		return
+	}
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, user)
+}
+func (s *Server) GetPostsFromUserId(c *gin.Context) {
+	posts, err := s.PostRepo.GetAllPostsFromUserId(c.Param("id"))
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, posts)
+}
+
+func (s *Server) GetAllPosts(c *gin.Context) {
+	posts, err := s.PostRepo.GetAllPosts()
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, posts)
+}
+
+func (s *Server) CreatePost(c *gin.Context) {
+	var post Post
+	err := c.BindJSON(&post)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	if len(post.AuthorId) == 0 {
+		c.JSON(400, gin.H{"error": "post failed, no author id"})
+		return
+	}
+	if len(post.Content) == 0 {
+		c.JSON(400, gin.H{"error": "post failed, no content"})
+		return
+	}
+
+	if len(post.Title) == 0 {
+		post.Title = "Untitled"
+	}
+	user, err := s.UserRepo.FindUser(post.AuthorId)
+	println(user.UserId)
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		c.JSON(404, gin.H{"error": "post failed, user not found"})
+		return
+	}
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = s.PostRepo.AddPost(post)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"message": "success"})
+}
+
+func (s *Server) CreateComment(c *gin.Context) {
+	var comment Comment
+	err := c.BindJSON(&comment)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	if len(comment.AuthorId) == 0 {
+		c.JSON(400, gin.H{"error": "comment failed, no author id"})
+		return
+	}
+	if len(comment.Body) == 0 {
+		c.JSON(400, gin.H{"error": "comment failed, no content"})
+		return
+	}
+	if len(comment.PostID) == 0 {
+		c.JSON(400, gin.H{"error": "comment failed, no post id"})
+		return
+	}
+	_, err = s.UserRepo.FindUser(comment.AuthorId)
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		c.JSON(404, gin.H{"error": "comment failed, user not found"})
+		return
+	}
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	_, err = s.PostRepo.FindPost(comment.PostID)
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		c.JSON(404, gin.H{"error": "comment failed, post not found"})
+		return
+	}
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	err = s.CommentRepo.AddComment(comment)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+}
+
+func (s *Server) GetCommentsFromPostId(c *gin.Context) {
+	postId := c.Param("id")
+	if len(postId) == 0 {
+		c.JSON(400, gin.H{"error": "no post id"})
+		return
+	}
+	comments, err := s.CommentRepo.GetAllCommentsFromPostId(postId)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, comments)
 }
 
 // returns a server with a default router and mock data

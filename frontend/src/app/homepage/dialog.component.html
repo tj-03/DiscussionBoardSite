@@ -1,0 +1,20 @@
+<h2 mat-dialog-title>{{post.title}}</h2>
+<mat-dialog-content class="mat-typography">
+  <p>{{post.content}}</p>
+</mat-dialog-content>
+
+<h1 mat-dialog-title>Comments: ({{comments.length}})</h1>
+<mat-dialog-content *ngFor = "let comment of comments" class="mat-typography">
+  <mat-card-subtitle>Username: {{comment.author?.name}}</mat-card-subtitle>
+  <p>{{comment.content}}</p>
+</mat-dialog-content>
+
+<mat-form-field class="comment-box">
+<mat-dialog-actions align="end">
+  <button mat-button  cdkFocusInitial (click) = "submitComment()">Comment</button>
+</mat-dialog-actions>
+
+  <mat-label>Leave a comment</mat-label>
+  <textarea   [(ngModel)] = "commentContent" matInput placeholder="Ex. It makes me feel..."></textarea>
+</mat-form-field>
+

@@ -1,12 +1,13 @@
 <mat-toolbar color="primary">
-    <a mat-button routerLink="homepage">Heap Underflow</a>
+    <div style = "position:relative; right:8px;">
+    <a mat-button routerLink="homepage">Heap Underflow</a></div>
 
     <div class="spacer"></div>
 
     <a routerLink="homepage">
     <div style = "position:relative; right:8px; top:4px;">
         <div class="home">
-        <mat-icon matBadge="2" matBadgeColor="accent">home</mat-icon>
+        <mat-icon color="accent">home</mat-icon>
           <span class="cdk-visually-hidden">
           </span>
       </div>
@@ -19,7 +20,7 @@
         <a  mat-raised-button color="accent" (click) = "auth.logout()">Log out</a>
     </ng-container>
     <ng-container *ngIf = "auth.userData.userToken == null" >
-         <a mat-raised-button color="accent" (click) = "auth.login()">Log in</a>
+         <a mat-raised-button color="accent" (click) = "auth.login()">Log in with Google</a>
     </ng-container>
 
 </mat-toolbar>

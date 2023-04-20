@@ -1,8 +1,10 @@
-<p>Welcome to Heap Underflow! If you have any questions, ask!</p>
-
-<label for="name">Search: </label>
-
-<input type="text" id="name" name="name" required
+<p></p>
+       <h1>Welcome to Heap Underflow! If you have any questions, ask!</h1>
+       <hr class="solid">
+       <p></p>
+<p>
+       <label for="name">Search: </label>
+       <input type="text" id="name" name="name" required
        minlength="1" maxlength="100" size="15">
 
 <mat-divider></mat-divider>
@@ -14,9 +16,23 @@
        </section>
 <mat-divider></mat-divider>
 
-<ul>
-       <li *ngFor="let post of posts">
-         <h2>User: {{ post.author?.name }}</h2>
-         <h2>Content: {{post.content}}</h2>
-       </li>
-</ul>
+
+<mat-card *ngFor = "let post of posts; let i = index" class="post-box" (click) = "openDialog(i)">
+       <mat-card-header class = "post-header post-box-title">
+              <mat-card-title>{{post.title}}</mat-card-title>
+              <mat-card-subtitle>by {{post.author?.name}}</mat-card-subtitle>
+       </mat-card-header>
+       <!-- <mat-card-content class="post-box-content">
+              <p>
+              {{post.content}}}
+              </p>
+       </mat-card-content> -->
+       <mat-card-actions>
+              <button mat-button>LIKE</button>
+              <button mat-button>COMMENT</button>
+       </mat-card-actions>
+       <mat-card-content>
+              {{post.points}} likes
+       </mat-card-content>
+</mat-card>
+

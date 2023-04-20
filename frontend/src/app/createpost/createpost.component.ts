@@ -9,6 +9,7 @@ import { AuthService } from '../services/auth.service';
 })
 export class CreatepostComponent {
   postContent: string = '';
+  postTitle: string = '';
   constructor(private httpClient: HttpClient, private auth: AuthService) { 
     //console.log(this.auth.userData);
   }
@@ -19,6 +20,7 @@ export class CreatepostComponent {
     header = header.set('Authorization', token);
 
     let post = {
+      title: this.postTitle,
       author_id: this.auth.userData.userId!,
       content: this.postContent
     }
