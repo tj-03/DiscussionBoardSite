@@ -120,9 +120,13 @@ func (p *PostRepository) ThumbUpPost(ctx context.Context, postId string) error {
 	if err != nil {
 		return err
 	}
+	objId, err := primitive.ObjectIDFromHex(postId)
+	if err != nil {
+		return err
+	}
 	points := post.Points
 	points++
-	filter := bson.D{{"_id", postId}}
+	filter := bson.D{{"_id", objId}}
 	update := bson.D{{"$set", bson.D{{"points", points}}}}
 	_, err = p.coll.UpdateOne(ctx, filter, update)
 	return err

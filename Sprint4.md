@@ -1,4 +1,10 @@
 # FrontEnd
+- Homepage rehaul
+- Login/Logout using Google auth
+- Add titles to posts
+- Post content and comments now show up in individual dialog box
+- Dark mode
+
 ## Issues Worked On
 - Added/adjusted spacers.
 - Adjusted text size across the program.
@@ -19,6 +25,12 @@ All tests passed.
 
 
 # BackEnd
+- Added endpoints for searching posts/users
+- Added endpoints for replying to posts
+- Added endpoints for liking/upvoting posts
+- Configured authorized endpoints (Firebase), allowing only those with a Google account to create posts and comments
+- Updated API documentation
+
 ## Issues Worked On
 - Add titles to posts.
 - Search posts by title.
@@ -30,6 +42,8 @@ All tests passed.
 - Posts now contain a points field for upvotes and downvotes.
 - Comments now conntain a points field for upvotes and downvotes.
 - Users can now be searched for by username.
+- Users can now login/logout using Firebase
+
 
 ## Tests Created
 - TestCommentPoints

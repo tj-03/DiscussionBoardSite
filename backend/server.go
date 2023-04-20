@@ -105,6 +105,7 @@ func (s *Server) Init(dbUrl string) {
 	//Get comments
 	noAuthApiGroup.GET("/post/comments/:id", s.GetCommentsFromPostId)
 	authApiGroup.POST("/post/comment", s.CreateComment)
+	authApiGroup.POST("/post/like", s.LikePost)
 	s.Engine = engine
 }
 
@@ -189,6 +190,23 @@ func (s *Server) CreatePost(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "success"})
 }
 
+func (s *Server) LikePost(c *gin.Context) {
+	postId := c.Param("id")
+	if len(postId) == 0 {
+		c.JSON(400, gin.H{"error": "post failed, no post id"})
+		return
+	}
+	_, err := s.PostRepo.FindPost(postId)
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		c.JSON(404, gin.H{"error": "post failed, post not found"})
+		return
+	}
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	s.PostRepo.ThumbUpPost(context.Background(), postId)
+}
 func (s *Server) CreateComment(c *gin.Context) {
 	var comment Comment
 	err := c.BindJSON(&comment)

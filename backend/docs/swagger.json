@@ -9,6 +9,83 @@
       "http"
     ],
     "paths": {
+      "/post":{
+        "post":{
+          "summary":"Create a new post",
+          "produces":[
+            "application/json"
+          ],
+          "parameters":[
+            {
+              "name":"post",
+              "in":"body",
+              "description":"Post to create",
+              "required":true,
+              "schema":{
+                "$ref":"#/definitions/Post"
+              }
+            }
+          ],
+          "responses":{
+            "200":{
+              "description":"OK",
+              "schema":{
+                "$ref":"#/definitions/Post"
+              }
+            },
+            "500":{
+              "description":"Internal Server Error",
+              "schema":{
+                "$ref":"#/definitions/Error"
+              }
+            }
+          }
+        }
+      },
+      "/post/comment/{id}":{
+        "post":{
+          "summary":"Create comment on a post",
+          "produces":[
+            "application/json"
+          ],
+          "responses":{
+            "200":{
+              "description":"OK"
+            },
+            "500":{
+              "description":"Internal Server Error",
+              "schema":{
+                "$ref":"#/definitions/Error"
+              }
+            }
+          }
+        }
+      },
+      "/post/comments":{
+        "get":{
+          "summary":"Get all comments on a post",
+          "produces":[
+            "application/json"
+          ],
+          "responses":{
+            "200":{
+              "description":"OK",
+              "schema":{
+                "type":"array",
+                "items":{
+                  "$ref":"#/definitions/Comment"
+                }
+              }
+            },
+            "500":{
+              "description":"Internal Server Error",
+              "schema":{
+                "$ref":"#/definitions/Error"
+              }
+            }
+          }
+        }
+      },
       "/user/{id}": {
         "get": {
           "description": "Get a user by ID",
@@ -102,6 +179,23 @@
     }
     },
     "definitions": {
+      "Comment":{
+        "type":"object",
+        "properties":{
+          "id":{
+            "type":"string"
+          },
+          "post_id":{
+            "type":"string"
+          },
+          "author_id":{
+            "type":"string"
+          },
+          "content":{
+            "type":"string"
+          }
+        }
+      },
       "User": {
         "type": "object",
         "properties": {

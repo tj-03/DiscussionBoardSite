@@ -44,6 +44,7 @@ export class DialogContentExampleDialog {
     });
   }
 
+  
   submitComment() {
     let headers = new HttpHeaders().set('Authorization', this.auth.userData.userToken!);
     this.httpClient.post('http://localhost:8080/api/post/comment', {
@@ -76,7 +77,7 @@ export class DialogContentExampleDialog {
 })
 export class HomepageComponent implements OnInit {
   posts: any;
-  constructor(private httpClient: HttpClient, public dialog: MatDialog) {
+  constructor(private httpClient: HttpClient, public dialog: MatDialog, private auth:AuthService) {
     this.posts = [];
   }
 
@@ -87,6 +88,7 @@ export class HomepageComponent implements OnInit {
       backdropClass: 'backdropClass'
     });
   }
+
   ngOnInit() {
     let url = 'http://localhost:8080/api';
     let header = new HttpHeaders();
